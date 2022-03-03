@@ -10,6 +10,10 @@ using namespace std;
 geometry_msgs::Pose p_odom_camOdo, p_camPose_bl;
 ros::Publisher odom_pub;
 ros::Subscriber odom_sub;
+string camera = "camera2";
+string base_link = "base_link_2";
+string prefix_odom = "cam2";
+string node_name = "publish_odom2";
 
 
 void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
@@ -21,8 +25,6 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     /// Transformation
     cout << ".2 Transform from odom to camera pose frame" << endl;
 
-    //cout << "p_camOdo_pose " << p_camOdo_pose << endl;
-    //cout << "p_odom_camOdo " << p_odom_camOdo << endl;
 
     // compose transformation odom <-> camera_odom_frame (+) camera_odom_frame <-> camera_pose_frame  = odom <-> camera_pose_frame
     pose_cov_ops::compose(p_odom_camOdo, p_camOdo_pose,  p_odom_camPose);
@@ -32,10 +34,12 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
 
     // prepare the new Odometry message
     cout << ".4 Build new message" << endl;
+    //string child_frame = prefix_odom + "_link_frame";
+    string child_frame = "base_link";
     nav_msgs::Odometry transformed_odom = *msg;
     transformed_odom.pose = p_odom_bl; // fill in the pose with covariance the transfromed pose
     transformed_odom.header.frame_id = "odom";    //reference frame
-    transformed_odom.child_frame_id = "base_link"; //child frame
+    transformed_odom.child_frame_id = child_frame.c_str(); //child frame
 
     cout << ".5 Now publish the converted message" << endl;
     // publish new odometry value
@@ -45,15 +49,10 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
 
 
 int main(int argc, char **argv) {
-    string camera = "camera2";
-    string base_link = "base_link_2";
-    string prefix_odom = "/cam2";
-    string node_name = "publish_odom2";
-
     // init node
     ros::init(argc, argv, node_name.c_str());
     ros::NodeHandle n;
-    string topic_pub = prefix_odom + "/odom/sample_throttled";
+    string topic_pub = "/"+prefix_odom + "/odom/sample_throttled";
     string topic_sub = "/"+camera+"/odom/sample_throttled";
     
 

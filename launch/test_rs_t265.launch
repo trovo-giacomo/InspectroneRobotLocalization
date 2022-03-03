@@ -43,13 +43,13 @@
 
 <!-- republishing transform and odometry for robot-localization -->
   
-  <!--<node name="odom1_tf_listener" pkg="inspectrone_test" type="publish_odom1_tf.py" required="true" />
+  <!--<node name="odom1_tf_listener" pkg="InspectroneRobotLocalization" type="publish_odom1_tf.py" required="true" />
     
-  <node name="odom2_tf_listener" pkg="inspectrone_test" type="publish_odom2_tf.py" required="true" />-->
+  <node name="odom2_tf_listener" pkg="InspectroneRobotLocalization" type="publish_odom2_tf.py" required="true" />-->
 
-  <node name="odom1_tf_listener" pkg="inspectrone_test" type="publish_odom1" required="true" />
+  <node name="odom1_tf_listener" pkg="InspectroneRobotLocalization" type="publish_odom1" required="true" />
     
-  <node name="odom2_tf_listener" pkg="inspectrone_test" type="publish_odom2" required="true" />
+  <node name="odom2_tf_listener" pkg="InspectroneRobotLocalization" type="publish_odom2" required="true" />
   
 <!-- Throttle odometry messages to a fixed rate around 25Hz -->
   <node name="odom_throttler1" type="drop" pkg="topic_tools" 
@@ -73,7 +73,7 @@
   </rosparam>
 
 
-  <include file="$(find inspectrone_test)/launch/t265.launch" >
+  <include file="$(find InspectroneRobotLocalization)/launch/t265.launch" >
       <arg name="enable_fisheye1"          value="true"/>
       <arg name="enable_fisheye2"          value="true"/>
       <arg name="fisheye_fps"              value="10"/>
@@ -95,7 +95,7 @@
       <!--<arg name="base_frame_id"            value="base_link"/>-->
   </include>
 
-  <include file="$(find inspectrone_test)/launch/t265.launch" >
+  <include file="$(find InspectroneRobotLocalization)/launch/t265.launch" >
       <arg name="enable_fisheye1"          value="true"/>
       <arg name="enable_fisheye2"          value="true"/>
       <arg name="fisheye_fps"              value="10"/>
@@ -125,8 +125,8 @@
         <param name="base_link_frame" value="base_link" />
         <param name="world_frame" value="odom" />
 
-        <param name="odom0" value="/cam1/odom/sample_throttled" />
-        <param name="odom1" value="/cam2/odom/sample_throttled" />
+        <param name="odom0" value="/cam2/odom/sample_throttled" />
+        <!--<param name="odom1" value="/cam2/odom/sample_throttled" />-->
 
         <!-- X,Y,Z,roll,pitch,yaw,X˙,Y˙,Z˙,roll˙,pitch˙,yaw˙,X¨,Y¨,Z¨)-->
         <rosparam param="odom0_config">[true, true, true,
@@ -135,11 +135,11 @@
                                         true, true, true,
                                         false, false, false]</rosparam>
 
-        <rosparam param="odom1_config">[true, true, true,
-                                        false, false, false,
+        <!--<rosparam param="odom1_config">[true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        false, false, false]</rosparam>
+                                        true, true, true,
+                                        false, false, false]</rosparam>-->
         <!--<rosparam param="imu0_config">[false, false, false,
                                         false, false, false,
                                         false, false, false,
@@ -152,7 +152,7 @@
                                         true, true, true]</rosparam>-->
 
         <param name="odom0_differential" value="false" />
-        <param name="odom1_differential" value="false" />
+        <!--<param name="odom1_differential" value="false" />-->
         <!-- mahalanobis distance threshold for odom0 and odom1 -->
         <!--<param name="odom0_pose_rejection_threshold" value="5" />
         <param name="odom0_twist_rejection_threshold" value="15" />
@@ -160,10 +160,10 @@
         <param name="odom1_twist_rejection_threshold" value="15" />-->
 
         <param name="odom0_relative" value="false" />
-        <param name="odom1_relative" value="false" />
+        <!--<param name="odom1_relative" value="false" />-->
 
         <param name="odom0_queue_size" value="50" />
-        <param name="odom1_queue_size" value="50" />
+        <!--<param name="odom1_queue_size" value="50" />-->
 
         <param name="print_diagnostics" value="false"/>
 
@@ -216,5 +216,5 @@
 
 
     </node>
-    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find inspectrone_test)/rviz/box_odom_visualization.rviz"/>
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find InspectroneRobotLocalization)/rviz/box_odom_visualization.rviz"/>
 </launch>
