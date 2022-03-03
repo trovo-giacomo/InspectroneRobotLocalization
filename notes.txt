@@ -1,0 +1,59 @@
+<!-- Good for two odometry only -->
+<rosparam param="process_noise_covariance">[1e-2, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                  0,    1e-2, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                  0,    0,    1e-2, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                  0,    0,    0,    5e-2 , 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                  0,    0,    0,    0,    5e-2,  0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                  0,    0,    0,    0,    0,    5e-2,  0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                  0,    0,    0,    0,    0,    0,    5e-2,   0,     0,    0,    0,    0,    0,    0,    0,
+                                                  0,    0,    0,    0,    0,    0,    0,     5e-2,   0,    0,    0,    0,    0,    0,    0,
+                                                  0,    0,    0,    0,    0,    0,    0,     0,     5e-2,  0,    0,    0,    0,    0,    0,
+                                                  0,    0,    0,    0,    0,    0,    0,     0,     0,    5e-2,  0,    0,    0,    0,    0,
+                                                  0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    5e-2,  0,    0,    0,    0,
+                                                  0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0.2,  0,    0,    0,
+                                                  0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0.1,  0,    0,
+                                                  0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0.1,  0,
+                                                  0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0.15]</rosparam>
+<!-- Good for two odometry + 2 IMU -->
+<rosparam param="process_noise_covariance">[1e-3, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    1e-3, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    1e-3, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    1e-2 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    1e-2, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    5e-1, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    5e-1,  0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     5e-1,  0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     5e-1, 0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-1, 0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-1, 0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    5e-1, 0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    5e-1,  0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    5e-1,  0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    5e-1]
+
+<!-- Quite good for 2nd bag -->
+<param name="odom1_pose_rejection_threshold" value="0.25" />
+<param name="odom1_twist_rejection_threshold" value="0.15" />
+<param name="imu1_pose_rejection_threshold" value="5" />
+<param name="imu1_angular_velocity_rejection_threshold" value="5" />
+<param name="imu1_linear_acceleration_rejection_threshold" value="5" />                                                    
+
+<!-- Good for 3rd gab -->
+<param name="odom1_pose_rejection_threshold" value="1.5" />
+<param name="odom1_twist_rejection_threshold" value="1.5" />
+<param name="imu0_pose_rejection_threshold" value="5" />
+<param name="imu0_angular_velocity_rejection_threshold" value="10" />
+<param name="imu0_linear_acceleration_rejection_threshold" value="10" />
+<param name="imu1_pose_rejection_threshold" value="5" />
+<param name="imu1_angular_velocity_rejection_threshold" value="10" />
+<param name="imu1_linear_acceleration_rejection_threshold" value="10" />
+
+<!-- Good for 1st - acceptable for 2nd - good for 3rd -->
+<param name="odom1_pose_rejection_threshold" value="1.5" />
+<param name="odom1_twist_rejection_threshold" value="1.5" />
+<param name="imu0_pose_rejection_threshold" value="7" />
+<param name="imu0_angular_velocity_rejection_threshold" value="15" />
+<param name="imu0_linear_acceleration_rejection_threshold" value="15" />
+<param name="imu1_pose_rejection_threshold" value="7" />
+<param name="imu1_angular_velocity_rejection_threshold" value="15" />
+<param name="imu1_linear_acceleration_rejection_threshold" value="15" />

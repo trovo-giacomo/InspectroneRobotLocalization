@@ -1,0 +1,220 @@
+<launch>
+
+<!-- Set up transformation 2 realsense t265 in the box-->
+
+<!-- static_transform_publisher x y z yaw pitch roll frame_id child_frame_id period_in_ms-->
+<!-- Odom frame in the same position as starting position of base_link frame -->
+<node pkg="tf" type="static_transform_publisher" name="static_odom_camera1"
+        args="0 0 0.0265 -1.57 0 0 odom camera1_odom_frame 1000"/>
+
+<node pkg="tf" type="static_transform_publisher" name="static_odom_camera2"
+        args="0.0935 0 0 0 0 0 odom camera2_odom_frame 1000"/>
+
+<!-- Transform base_link to cameras-->
+<node pkg="tf" type="static_transform_publisher" name="static_bl_camera1"
+        args="0 0 0.0265 -1.57 0 0 base_link cam1_link_frame 1000"/>
+
+<node pkg="tf" type="static_transform_publisher" name="static_bl_camera2"
+        args="0.0935 0 0 0 0 0 base_link cam2_link_frame 1000"/>
+
+<!-- Transform from camera_pose_frame to base_link - for robot_localization -->
+<node pkg="tf" type="static_transform_publisher" name="static_came1_bl"
+        args="0 0 -0.0265 1.57 0 0 camera1_pose_frame base_link_1 1000"/>
+
+<node pkg="tf" type="static_transform_publisher" name="static_cam2_bl"
+        args="-0.0935 0 0 0 0 0 camera2_pose_frame base_link_2 1000"/>
+
+
+
+<!-- launch node to throttle images for logging -->
+  <node name="drop_image1" pkg="topic_tools" type="drop" output="screen"
+    args="/camera1/fisheye1/image_raw  9 10">
+  </node>
+  <node name="drop_image2" pkg="topic_tools" type="drop" output="screen"
+    args="/camera1/fisheye2/image_raw  9 10">
+  </node>
+
+  <node name="drop_image3" pkg="topic_tools" type="drop" output="screen"
+    args="/camera2/fisheye1/image_raw  9 10">
+  </node>
+  <node name="drop_image4" pkg="topic_tools" type="drop" output="screen"
+    args="/camera2/fisheye2/image_raw  9 10">
+  </node>
+
+<!-- republishing transform and odometry for robot-localization -->
+  
+  <!--<node name="odom1_tf_listener" pkg="inspectrone_test" type="publish_odom1_tf.py" required="true" />
+    
+  <node name="odom2_tf_listener" pkg="inspectrone_test" type="publish_odom2_tf.py" required="true" />-->
+
+  <node name="odom1_tf_listener" pkg="inspectrone_test" type="publish_odom1" required="true" />
+    
+  <node name="odom2_tf_listener" pkg="inspectrone_test" type="publish_odom2" required="true" />
+  
+<!-- Throttle odometry messages to a fixed rate around 25Hz -->
+  <node name="odom_throttler1" type="drop" pkg="topic_tools" 
+    args="/camera1/odom/sample 7 8 /camera1/odom/sample_throttled" >
+  </node>
+  <node name="odom_throttler2" type="drop" pkg="topic_tools" 
+    args="/camera2/odom/sample 7 8 /camera2/odom/sample_throttled" >
+  </node>
+
+<!-- Launch Realsense Camera -->
+  <!-- 16 -->
+  <rosparam>
+      /camera1/tracking_module/frames_queue_size: 2
+      /camera2/tracking_module/frames_queue_size: 2
+  </rosparam>
+  <rosparam>
+      /camera1/tracking_module/enable_pose_jumping: true
+      /camera1/tracking_module/enable_relocalization: false
+      /camera2/tracking_module/enable_pose_jumping: true
+      /camera2/tracking_module/enable_relocalization: false
+  </rosparam>
+
+
+  <include file="$(find inspectrone_test)/launch/t265.launch" >
+      <arg name="enable_fisheye1"          value="true"/>
+      <arg name="enable_fisheye2"          value="true"/>
+      <arg name="fisheye_fps"              value="10"/>
+      <arg name="enable_sync"         value="true"/>
+      <arg name="unite_imu_method" default="copy"/>
+
+      <arg name="gyro_fps"                 value="200"/>
+      <arg name="accel_fps"                value="62"/>
+      <arg name="enable_gyro"              value="true"/>
+      <arg name="enable_accel"             value="true"/>
+      <arg name="publish_odom_tf"          value="true"/>
+      <arg name="publish_tf"                value="true" />
+      <arg name="initial_reset"            value="true"/>
+      <!--<arg name="enable_pose_jumping"       value="false" />-->
+      <arg name="camera"                   value="camera1"/>
+      <arg name="serial_no"            value="905312112087" />
+      
+      <!--<arg name="odom_frame_id"            value="odom"/>-->
+      <!--<arg name="base_frame_id"            value="base_link"/>-->
+  </include>
+
+  <include file="$(find inspectrone_test)/launch/t265.launch" >
+      <arg name="enable_fisheye1"          value="true"/>
+      <arg name="enable_fisheye2"          value="true"/>
+      <arg name="fisheye_fps"              value="10"/>
+      <arg name="enable_sync"         value="true"/>
+      <arg name="unite_imu_method" default="copy"/>
+
+      <arg name="gyro_fps"                 value="200"/>
+      <arg name="accel_fps"                value="62"/>
+      <arg name="enable_gyro"              value="true"/>
+      <arg name="enable_accel"             value="true"/>
+      <!--<arg name="enable_pose_jumping"       value="false" />-->
+      <arg name="publish_tf"                value="true" />
+      <arg name="publish_odom_tf"          value="true"/>
+      <arg name="initial_reset"          value="true"/>
+      <arg name="camera"                   value="camera2"/>
+      <arg name="serial_no"            value="144222110422" />
+
+      <!--<arg name="odom_frame_id"            value="odom"/>-->
+      <!--<arg name="base_frame_id"            value="base_link"/>-->
+
+  </include>
+
+<node name="ekf_odom" pkg="robot_localization" type="ekf_localization_node" clear_params="true" required="true">
+        <param name="sensor_timeout" value="0.1"/>
+        <!--param name="map_frame" value="map" /-->
+        <param name="odom_frame" value="odom" />
+        <param name="base_link_frame" value="base_link" />
+        <param name="world_frame" value="odom" />
+
+        <param name="odom0" value="/cam1/odom/sample_throttled" />
+        <param name="odom1" value="/cam2/odom/sample_throttled" />
+
+        <!-- X,Y,Z,roll,pitch,yaw,X˙,Y˙,Z˙,roll˙,pitch˙,yaw˙,X¨,Y¨,Z¨)-->
+        <rosparam param="odom0_config">[true, true, true,
+                                        false, false, false,
+                                        true, true, true,
+                                        true, true, true,
+                                        false, false, false]</rosparam>
+
+        <rosparam param="odom1_config">[true, true, true,
+                                        false, false, false,
+                                        true, true, true,
+                                        true, true, true,
+                                        false, false, false]</rosparam>
+        <!--<rosparam param="imu0_config">[false, false, false,
+                                        false, false, false,
+                                        false, false, false,
+                                        true, true, true,
+                                        true, true, true]</rosparam>
+        <rosparam param="imu1_config">[false, false, false,
+                                        false, false, false,
+                                        false, false, false,
+                                        true, true, true,
+                                        true, true, true]</rosparam>-->
+
+        <param name="odom0_differential" value="false" />
+        <param name="odom1_differential" value="false" />
+        <!-- mahalanobis distance threshold for odom0 and odom1 -->
+        <!--<param name="odom0_pose_rejection_threshold" value="5" />
+        <param name="odom0_twist_rejection_threshold" value="15" />
+        <param name="odom1_pose_rejection_threshold" value="5" />
+        <param name="odom1_twist_rejection_threshold" value="15" />-->
+
+        <param name="odom0_relative" value="false" />
+        <param name="odom1_relative" value="false" />
+
+        <param name="odom0_queue_size" value="50" />
+        <param name="odom1_queue_size" value="50" />
+
+        <param name="print_diagnostics" value="false"/>
+
+        <param name="debug"           value="false"/>
+        <param name="debug_out_file"  value="debug_ekf_localization.txt"/>
+        
+        <!-- If true, will dynamically scale the process_noise_covariance based on the robot’s velocity. This is useful, e.g., when you want your robot’s estimate error covariance to stop growing when the robot is stationary.-->
+        <param name="dynamic_process_noise_covariance" value="true" />
+
+        <!-- The process noise covariance, commonly denoted Q, is used to model uncertainty in the prediction stage of the filtering algorithms. In general, the larger the value for Q relative to the variance for a given variable in an input message, the faster the filter will converge to the value in the measurement.-->
+        <!--<rosparam param="process_noise_covariance">[1e-3, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    1e-3, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    1e-3, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    1e-2 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    1e-2, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    1e-1, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    5e-1,  0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     5e-1,  0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     5e-1, 0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-1, 0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-1, 0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    5e-1, 0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-3,  0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-3,  0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-3]</rosparam>-->
+      <!-- initial P -->
+      <!--<rosparam param="initial_estimate_covariance">[1e-12, 0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                                     0,    1e-12, 0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                                     0,    0,    1e-12, 0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                                     0,    0,    0,    1e-9, 0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                                     0,    0,    0,    0,    1e-9, 0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                                     0,    0,    0,    0,    0,    1e-9, 0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                                     0,    0,    0,    0,    0,    0,    1e-9, 0,    0,    0,     0,     0,     0,    0,    0,
+                                                     0,    0,    0,    0,    0,    0,    0,    1e-9, 0,    0,     0,     0,     0,    0,    0,
+                                                     0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,     0,     0,     0,    0,    0,
+                                                     0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9,  0,     0,     0,    0,    0,
+                                                     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     1e-9,  0,     0,    0,    0,
+                                                     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     1e-9,  0,    0,    0,
+                                                     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     1e-12, 0,    0,
+                                                     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    1e-12, 0,
+                                                     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    1e-12]</rosparam>-->
+    <rosparam param="initial_state">[0.0,  0.0,  0.0,
+                                     0.0,  0.0,  0.0,
+                                     0.0,  0.0,  0.0,
+                                     0.0,  0.0,  0.0,
+                                     0.0,  0.0,  0.0]</rosparam>
+
+
+
+
+
+    </node>
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find inspectrone_test)/rviz/box_odom_visualization.rviz"/>
+</launch>

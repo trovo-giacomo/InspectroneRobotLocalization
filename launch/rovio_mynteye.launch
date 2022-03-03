@@ -1,0 +1,42 @@
+<launch>
+  <arg name="record_bag" default="true" />
+  <arg name="input_bag_name" default="2022-02-02-14-03-37.bag" />
+  <arg name="output_bag_name" default="rovio_mynteye.bag" />
+  <param name="use_sim_time" value="true" />
+  <!-- Play bag -->
+  <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/inspectrone/$(arg input_bag_name) --clock"/>
+
+  <!-- Start rovio -->
+  <include file="$(find rovio)/launch/rovio_node_mynteye.launch" />
+
+  <!-- De-compress left and right image -->
+  <!-- rosrun image_transport republish compressed in:=/mynteye/left/image_raw raw out:=/mynteye/left/image_raw -->
+  <node
+    pkg="image_transport"
+    type="republish"
+    name="republish_left"
+    args="compressed in:=/mynteye/left/image_raw raw out:=/mynteye/left/image_raw"
+    output="log"
+  />
+
+  <!-- rosrun image_transport republish compressed in:=/mynteye/right/image_raw raw out:=/mynteye/right/image_raw -->
+  <node
+    pkg="image_transport"
+    type="republish"
+    name="republish_right"
+    args="compressed in:=/mynteye/right/image_raw raw out:=/mynteye/right/image_raw"
+    output="log" />
+
+  <!-- Run transform between 'abs_correction' and 'odom' (realsense) -->
+  <node 
+    pkg="inspectrone_test"
+    type="publish_tf_mynteye_odom_realsense.py"
+    name="publish_tf_mynteye_odom_realsense"
+    output="log"
+    />
+
+  <!-- Recrod new bag -->
+  <node pkg="rosbag" type="record" name="rosbag_simulation"
+        args="record -O /home/giacomo/inspectrone_ws/bags/inspectrone/rovio/$(arg output_bag_name) /tf /rovio/odometry /camera/odom/sample /camera/odom/sample_throttled /camera/gyro/imu_info /camera/imu /mavros/imu/data /mavros/imu/data_raw /mynteye/imu/data_raw /mynteye/imu/data_raw_processed"
+        if="$(arg record_bag)" />
+</launch>
