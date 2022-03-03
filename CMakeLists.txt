@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(inspectrone_test)
+project(InspectroneRobotLocalization)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -107,7 +107,7 @@ SET(CMAKE_BUILD_TYPE RelWithDebInfo)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+# trone INCLUDE_DIRS include
 #  LIBRARIES inspectrone_test
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
