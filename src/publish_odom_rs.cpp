@@ -28,7 +28,18 @@ void transformPose(geometry_msgs::PoseWithCovariance p_camOdo_pose, geometry_msg
     //cout << ".3 Transform from odom to base_link" << endl;
     // compose transformation odom <-> camera_pose_frame (+) camera_pose_frame <-> base_link = odom <-> base_link
     pose_cov_ops::compose(p_odom_camPose, p_camPose_bl, p_odom_bl);
-    
+    //inflate covariance of orientation
+    float kCovaraince = 1000; //infalse covariance constant
+    p_odom_bl.covariance[21] = p_odom_bl.covariance[21] * kCovaraince;
+    //p_odom_bl.covariance[22] = p_odom_bl.covariance[22] * kCovaraince;
+    //p_odom_bl.covariance[23] = p_odom_bl.covariance[23] * kCovaraince;
+    //p_odom_bl.covariance[27] = p_odom_bl.covariance[27] * kCovaraince;
+    p_odom_bl.covariance[28] = p_odom_bl.covariance[28] * kCovaraince;
+    //p_odom_bl.covariance[29] = p_odom_bl.covariance[29] * kCovaraince;
+    //p_odom_bl.covariance[33] = p_odom_bl.covariance[33] * kCovaraince;
+    //p_odom_bl.covariance[34] = p_odom_bl.covariance[34] * kCovaraince;
+    p_odom_bl.covariance[35] = p_odom_bl.covariance[35] * kCovaraince;
+
 }//transformPose
 
 void transformTwist(geometry_msgs::TwistWithCovariance msg_twist, geometry_msgs::TwistWithCovariance& new_twist){
