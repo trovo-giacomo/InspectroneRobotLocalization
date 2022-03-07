@@ -47,9 +47,9 @@
     
   <node name="odom2_tf_listener" pkg="InspectroneRobotLocalization" type="publish_odom2_tf.py" required="true" />-->
 
-  <node name="odom1_tf_listener" pkg="InspectroneRobotLocalization" type="publish_odom1" required="true" />
+  <node name="odom1_tf_listener" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera1 base_link_1 cam1 publish_odom1"/>
     
-  <node name="odom2_tf_listener" pkg="InspectroneRobotLocalization" type="publish_odom2" required="true" />
+  <node name="odom2_tf_listener" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera2 base_link_2 cam2 publish_odom2" />
   
 <!-- Throttle odometry messages to a fixed rate around 25Hz -->
   <node name="odom_throttler1" type="drop" pkg="topic_tools" 
@@ -118,28 +118,28 @@
 
   </include>
 
-<node name="ekf_odom" pkg="robot_localization" type="ekf_localization_node" clear_params="true" required="true">
+<node name="ekf_odom" pkg="robot_localization" type="ukf_localization_node" clear_params="true" required="true">
         <param name="sensor_timeout" value="0.1"/>
         <!--param name="map_frame" value="map" /-->
         <param name="odom_frame" value="odom" />
         <param name="base_link_frame" value="base_link" />
         <param name="world_frame" value="odom" />
 
-        <param name="odom0" value="/cam2/odom/sample_throttled" />
-        <!--<param name="odom1" value="/cam2/odom/sample_throttled" />-->
+        <param name="odom0" value="/cam1/odom/sample_throttled" />
+        <param name="odom1" value="/cam2/odom/sample_throttled" />
 
         <!-- X,Y,Z,roll,pitch,yaw,X˙,Y˙,Z˙,roll˙,pitch˙,yaw˙,X¨,Y¨,Z¨)-->
-        <rosparam param="odom0_config">[true, true, true,
+        <rosparam param="odom0_config">[false, false, false,
                                         false, false, false,
                                         true, true, true,
-                                        true, true, true,
+                                        false, false, false,
                                         false, false, false]</rosparam>
 
-        <!--<rosparam param="odom1_config">[true, true, true,
+        <rosparam param="odom1_config">[false, false, false,
                                         true, true, true,
                                         true, true, true,
-                                        true, true, true,
-                                        false, false, false]</rosparam>-->
+                                        false, false, false,
+                                        false, false, false]</rosparam>
         <!--<rosparam param="imu0_config">[false, false, false,
                                         false, false, false,
                                         false, false, false,
@@ -152,7 +152,7 @@
                                         true, true, true]</rosparam>-->
 
         <param name="odom0_differential" value="false" />
-        <!--<param name="odom1_differential" value="false" />-->
+        <param name="odom1_differential" value="false" />
         <!-- mahalanobis distance threshold for odom0 and odom1 -->
         <!--<param name="odom0_pose_rejection_threshold" value="5" />
         <param name="odom0_twist_rejection_threshold" value="15" />
@@ -160,10 +160,10 @@
         <param name="odom1_twist_rejection_threshold" value="15" />-->
 
         <param name="odom0_relative" value="false" />
-        <!--<param name="odom1_relative" value="false" />-->
+        <param name="odom1_relative" value="false" />
 
         <param name="odom0_queue_size" value="50" />
-        <!--<param name="odom1_queue_size" value="50" />-->
+        <param name="odom1_queue_size" value="50" />
 
         <param name="print_diagnostics" value="false"/>
 
@@ -174,21 +174,21 @@
         <param name="dynamic_process_noise_covariance" value="true" />
 
         <!-- The process noise covariance, commonly denoted Q, is used to model uncertainty in the prediction stage of the filtering algorithms. In general, the larger the value for Q relative to the variance for a given variable in an input message, the faster the filter will converge to the value in the measurement.-->
-        <!--<rosparam param="process_noise_covariance">[1e-3, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                    0,    1e-3, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                    0,    0,    1e-3, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                    0,    0,    0,    1e-2 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                    0,    0,    0,    0,    1e-2, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+        <rosparam param="process_noise_covariance">[1e-5, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    1e-5, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    1e-5, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    1e-1 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    1e-1, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                     0,    0,    0,    0,    0,    1e-1, 0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                    0,    0,    0,    0,    0,    0,    5e-1,  0,     0,    0,    0,    0,    0,    0,    0,
-                                                    0,    0,    0,    0,    0,    0,    0,     5e-1,  0,    0,    0,    0,    0,    0,    0,
-                                                    0,    0,    0,    0,    0,    0,    0,     0,     5e-1, 0,    0,    0,    0,    0,    0,
-                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-1, 0,    0,    0,    0,    0,
-                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-1, 0,    0,    0,    0,
-                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    5e-1, 0,    0,    0,
-                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-3,  0,    0,
-                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-3,  0,
-                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-3]</rosparam>-->
+                                                    0,    0,    0,    0,    0,    0,    1e-1,  0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     1e-1,  0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     1e-1, 0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-5, 0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-5, 0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-5, 0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-5, 0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-5,  0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-5]</rosparam>
       <!-- initial P -->
       <!--<rosparam param="initial_estimate_covariance">[1e-12, 0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
                                                      0,    1e-12, 0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
