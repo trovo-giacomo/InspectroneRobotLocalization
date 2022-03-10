@@ -29,7 +29,7 @@ void transformPose(geometry_msgs::PoseWithCovariance p_camOdo_pose, geometry_msg
     // compose transformation odom <-> camera_pose_frame (+) camera_pose_frame <-> base_link = odom <-> base_link
     pose_cov_ops::compose(p_odom_camPose, p_camPose_bl, p_odom_bl);
     //inflate covariance of orientation
-    float kCovaraince = 1000; //infalse covariance constant
+    float kCovaraince = 10; //infalse covariance constant
     p_odom_bl.covariance[21] = p_odom_bl.covariance[21] * kCovaraince;
     //p_odom_bl.covariance[22] = p_odom_bl.covariance[22] * kCovaraince;
     //p_odom_bl.covariance[23] = p_odom_bl.covariance[23] * kCovaraince;
@@ -102,10 +102,21 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     
     // Transform Pose from camera_odom <-> camera_pose to odom <-> base_link
     transformPose(p_camOdo_pose, p_odom_bl);
+    if(isnan(p_odom_bl.pose.position.x) || isnan(p_odom_bl.pose.position.y) || isnan(p_odom_bl.pose.position.z) || isnan(p_odom_bl.pose.orientation.x) || isnan(p_odom_bl.pose.orientation.y) || isnan(p_odom_bl.pose.orientation.z) || isnan(p_odom_bl.pose.orientation.w) ){
+        // at least one element in the transformation is nan - dropping transform
+        cerr << "Nan values in the transformation of the pose in " << camera << endl;        
+        return;
+    }
     // get Twist with Covaraince from the message
     msg_twist = msg->twist;
     // Rotate twist to be from cam_pose to base_link
     transformTwist(msg_twist,new_twist);
+
+    if(isnan(new_twist.twist.linear.x) || isnan(new_twist.twist.linear.y) || isnan(new_twist.twist.linear.z) ){
+        // at least one element in the transformation is nan - dropping transform
+        cerr << "Nan values in the transformation of the twist in " << camera << endl;        
+        return;
+    }
 
     // prepare the new Odometry message
     //cout << ".4 Build new message" << endl;
