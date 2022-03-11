@@ -1,5 +1,5 @@
 <launch>
-    <arg name="input_bag_name" default="box_2rs_bag1.bag" />
+    <arg name="input_bag_name" default="box_2rs_bag2.bag" />
     <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/box_rs/$(arg input_bag_name) --clock -s 5"/>
     
     <!-- Set up transformation 2 realsense t265 in the box-->
@@ -49,9 +49,9 @@
             <param name="odom1_differential" value="false" />
             <!-- mahalanobis distance threshold for odom0 and odom1 -->
             <!--<param name="odom0_pose_rejection_threshold" value="5" />
-            <param name="odom0_twist_rejection_threshold" value="15" />
-            <param name="odom1_pose_rejection_threshold" value="5" />
-            <param name="odom1_twist_rejection_threshold" value="15" />-->
+            <param name="odom1_pose_rejection_threshold" value="5" />-->
+            <!--<param name="odom0_twist_rejection_threshold" value="2" />
+            <param name="odom1_twist_rejection_threshold" value="2" />-->
 
             <param name="odom0_relative" value="false" />
             <param name="odom1_relative" value="false" />
@@ -85,15 +85,32 @@
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-9, 0,
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-9]</rosparam>-->
             <!-- EKF param - trials -->
+            <!--
+                <rosparam param="process_noise_covariance">[1e-6, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    1e-6, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    1e-6, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    1e-1 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    1e-1, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    1e-1, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    1e-2,  0,     0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     1e-2,  0,    0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     1e-2, 0,    0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-7, 0,    0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-7, 0,    0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-7, 0,    0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-7, 0,    0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-7,  0,
+                                                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-7]</rosparam>
+            -->
             <rosparam param="process_noise_covariance">[5e-5, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    5e-5, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    0,    5e-5, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    1e-1 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    1e-1, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    0,    1e-1, 0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    0,    0,    5e-2,  0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    0,    0,    0,     5e-2,  0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    0,    0,    0,     0,     5e-2, 0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    5e-1 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    5e-1, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    5e-1, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    1e-2,  0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     1e-2,  0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     1e-2, 0,    0,    0,    0,    0,    0,
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-5, 0,    0,    0,    0,    0,
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-5, 0,    0,    0,    0,
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-5, 0,    0,    0,

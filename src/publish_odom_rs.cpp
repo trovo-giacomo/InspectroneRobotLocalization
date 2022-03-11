@@ -90,12 +90,29 @@ void transformTwist(geometry_msgs::TwistWithCovariance msg_twist, geometry_msgs:
     cout << newCovariance_linear_vel[2][0] << " " << newCovariance_linear_vel[2][1] << " " << newCovariance_linear_vel[2][2] << endl;*/
 }
 
+/**
+ * inflate covariance of linear velocity in the Twist message when the pose is uncertain
+ * @param twist original twist message of odometry topic
+ * @param new_twist_cov new twist message - it is the same as the twist parameter above but with an inflated covariance
+ */
+void inflateLinVelCovariance(geometry_msgs::TwistWithCovariance twist, geometry_msgs::TwistWithCovariance& new_twist_cov){
+    //static float prev_cov = 0.1;
+    //float kDeltaCovariance = pose.covariance[0] / prev_cov;
+    static float cov_unaccurate = 0.1, kInflate = 5.0, eps=0.01;
+    new_twist_cov = twist;
+    if(abs(twist.covariance[0] - cov_unaccurate) < eps){
+        new_twist_cov.covariance[0] = twist.covariance[0] * kInflate;
+        new_twist_cov.covariance[7] = twist.covariance[7] * kInflate;
+        new_twist_cov.covariance[14] = twist.covariance[14] * kInflate;
+    }
+}
+
 
 
 void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     //cout << ".1 Now reveived new odometry message -> convertion in process" << endl;
     geometry_msgs::PoseWithCovariance p_camOdo_pose, p_odom_bl;
-    geometry_msgs::TwistWithCovariance msg_twist, new_twist;
+    geometry_msgs::TwistWithCovariance msg_twist, new_twist, new_twist_cov;
 
     // get the position with covariance between camera_odom_frame and camera_pose_frame
     p_camOdo_pose = msg->pose;
@@ -104,7 +121,7 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     transformPose(p_camOdo_pose, p_odom_bl);
     if(isnan(p_odom_bl.pose.position.x) || isnan(p_odom_bl.pose.position.y) || isnan(p_odom_bl.pose.position.z) || isnan(p_odom_bl.pose.orientation.x) || isnan(p_odom_bl.pose.orientation.y) || isnan(p_odom_bl.pose.orientation.z) || isnan(p_odom_bl.pose.orientation.w) ){
         // at least one element in the transformation is nan - dropping transform
-        cerr << "Nan values in the transformation of the pose in " << camera << endl;        
+        cout << "Nan values in the transformation of the pose in " << camera << endl;        
         return;
     }
     // get Twist with Covaraince from the message
@@ -114,9 +131,12 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
 
     if(isnan(new_twist.twist.linear.x) || isnan(new_twist.twist.linear.y) || isnan(new_twist.twist.linear.z) ){
         // at least one element in the transformation is nan - dropping transform
-        cerr << "Nan values in the transformation of the twist in " << camera << endl;        
+        cout << "Nan values in the transformation of the twist in " << camera << endl;        
         return;
     }
+
+    // inflate covariance linear velocity when estimate is uncertain
+    inflateLinVelCovariance(new_twist, new_twist_cov);
 
     // prepare the new Odometry message
     //cout << ".4 Build new message" << endl;
@@ -124,7 +144,7 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     string child_frame = "base_link";
     nav_msgs::Odometry transformed_odom = *msg;
     transformed_odom.pose = p_odom_bl; // fill in the pose with covariance the transfromed pose
-    transformed_odom.twist = new_twist; // fill in the rotated twist
+    transformed_odom.twist = new_twist_cov; // fill in the rotated twist + inflate/deflated covariance
     transformed_odom.header.frame_id = "odom";    //reference frame
     transformed_odom.child_frame_id = child_frame.c_str(); //child frame
 
