@@ -33,6 +33,8 @@
         <param name="base_frame" type="str" value="/imu" />
         <param name="child_frame_prefix" type="str" value="/camera1_base" />
         <param name="num_cameras" type="int" value="2" /> 
+        <param name="publish_cameras_tf" value="false" />
+        <param name="publish_odom_tf" value="true" />
     </node>
     <!-- Camera 2 - front -->
     <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera2" output="screen">
@@ -40,6 +42,8 @@
         <param name="base_frame" type="str" value="/imu" />
         <param name="child_frame_prefix" type="str" value="/camera2_base" />
         <param name="num_cameras" type="int" value="2" /> 
+        <param name="publish_cameras_tf" value="false" />
+        <param name="publish_odom_tf" value="true" />
     </node>
     <!-- Camera 3 - bottom -->
     <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera3" output="screen">
@@ -47,6 +51,8 @@
         <param name="base_frame" type="str" value="/imu" />
         <param name="child_frame_prefix" type="str" value="/camera3_base" />
         <param name="num_cameras" type="int" value="2" /> 
+        <param name="publish_cameras_tf" value="false" />
+        <param name="publish_odom_tf" value="true" />
     </node>
 
 </launch>

@@ -8,7 +8,7 @@ import tf
 import tf2_ros
 import numpy as np
 import geometry_msgs.msg
-from tf.transformations import quaternion_from_matrix, translation_from_matrix, concatenate_matrices
+from tf.transformations import quaternion_from_matrix, translation_from_matrix, concatenate_matrices, translation_matrix
 
 # return an homogeneous transformation from the yaml file resulted from calibration
 # @param file: path to the yaml file that contains the requested homogeneous transformation
@@ -62,6 +62,8 @@ if __name__ == '__main__':
     base_frame = rospy.get_param("~base_frame")
     child_frame = rospy.get_param("~child_frame_prefix")
     num_cameras = rospy.get_param("~num_cameras")
+    is_pub_cameras_tf = rospy.get_param("~publish_cameras_tf")
+    is_pub_odom_tf = rospy.get_param("~publish_odom_tf")
     I = np.identity(4)
 
     T_imu_cams = []
@@ -71,16 +73,33 @@ if __name__ == '__main__':
         T_imu_cam = np.linalg.inv(T_cam_imu)
         T_imu_cams.append(T_imu_cam)
 
-    ## publish T_imu_cams transformations as TF static transfroms
+    if(num_cameras == 2):
+        # t265 camera - find the middle point of the two cameras
+        # get translation vector from each camera
+        t_cam1 = translation_from_matrix(T_imu_cams[0])
+        t_cam2 = translation_from_matrix(T_imu_cams[1])
+        # get vector between fisheye camera 1 and fisheye camera2
+        t_cam1_cam2 = t_cam2 - t_cam1
+        # get vector from fisheye camera 1 to the middle point of the previous vector (odometry reference)
+        t_cam_odom = t_cam1_cam2 / 2
+        # build homogeneous transformation between IMU and the just calculated odometry reference = T_imu_camera1 * T_cam_odom
+        T_imu_cam_odom = concatenate_matrices(translation_matrix(t_cam_odom), T_imu_cams[0])
+
+    ## publish T_imu_cams and T_imu_cam_odom transformations as TF static transfroms
     broadcaster = tf2_ros.StaticTransformBroadcaster()
     static_transforms = []
-    for i,transform in enumerate(T_imu_cams):
-        T_static_imu_cam = buildStaticTransform(transform,base_frame, child_frame + "_fisheye"+str(i))
-        # stack all the rtansforomation in a list because broadcaster is latched to latched to /tf_static so only one stansform can be published at the time
-        static_transforms.append(T_static_imu_cam)
+    if(is_pub_cameras_tf):
+        for i,transform in enumerate(T_imu_cams):
+            T_static_imu_cam = buildStaticTransform(transform,base_frame, child_frame + "_fisheye"+str(i))
+            # stack all the rtansforomation in a list because broadcaster is latched to latched to /tf_static so only one stansform can be published at the time
+            static_transforms.append(T_static_imu_cam)
 
+    if(is_pub_odom_tf and num_cameras==2):
+        T_static_imu_camera_odom = buildStaticTransform(T_imu_cam_odom,base_frame, child_frame + "_odom")
+        static_transforms.append(T_static_imu_camera_odom)
+    
     # publish all the transformations
     broadcaster.sendTransform(static_transforms)
 
-    # ROS spin until the end of the program
+    ## ROS spin until the end of the program
     rospy.spin()
