@@ -8,21 +8,45 @@
     <node/>-->
     
 
-    <!-- multi camera visualization -->
-    <!--<node pkg="InspectroneRobotLocalization" type="publish_camera_camera_tf.py" name="publish_camera_camera_tf" output="screen">
-        <param name="yaml_file_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_camera_calibration_imu_cams.yaml" />
+    <!-- multi camera visualization tf -->
+    <!--<node pkg="InspectroneRobotLocalization" type="publish_camera_camera_tf.py" name="publish_camera_camera_tf" output="screen" >
+        <param name="yaml_file_path" value="$(find InspectroneRobotLocalization)/data/camchain-rs_camera_calibration_cams_v3.yaml" />
         <param name="reference_frame" value="/camera_base_0" />
         <param name="child_frame" value="/camera_base" />
         <param name="num_cameras" value="6" />
-    <node/>-->
-    
-    <node pkg="InspectroneRobotLocalization" type="publish_cameras_tf.py" name="publish_cameras_tf" output="screen">
+    </node> -->
+
+    <!-- imu camera to camera 0 and 6 camera chain visualization tf -->
+    <!--<node pkg="InspectroneRobotLocalization" type="publish_cameras_tf.py" name="publish_cameras_tf" output="screen">
         <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_camera_calibration_imu_cam1_v3.yaml" />
-        <param name="cam_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-rs_camera_calibration_imu_cams.yaml" />
+        <param name="cam_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-rs_camera_calibration_cams_v3.yaml" />
         <param name="base_frame" value="/imu" />
         <param name="child_frame_prefix" value="/camera_base" />
         <param name="num_cameras" value="6" />
-    </node>
+    </node>-->
+    
 
+    <!-- Visualize and publish IMU camera extrinsic for each stereo camera  -->
+    <!-- Camera 1 - top -->
+    <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera1" output="screen">
+        <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_camera_calibration_imu_cam1_v3.yaml" />
+        <param name="base_frame" type="str" value="/imu" />
+        <param name="child_frame_prefix" type="str" value="/camera1_base" />
+        <param name="num_cameras" type="int" value="2" /> 
+    </node>
+    <!-- Camera 2 - front -->
+    <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera2" output="screen">
+        <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_camera_calibration_imu_cam2_v1.yaml" />
+        <param name="base_frame" type="str" value="/imu" />
+        <param name="child_frame_prefix" type="str" value="/camera2_base" />
+        <param name="num_cameras" type="int" value="2" /> 
+    </node>
+    <!-- Camera 3 - bottom -->
+    <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera3" output="screen">
+        <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_camera_calibration_imu_cam3_v1.yaml" />
+        <param name="base_frame" type="str" value="/imu" />
+        <param name="child_frame_prefix" type="str" value="/camera3_base" />
+        <param name="num_cameras" type="int" value="2" /> 
+    </node>
 
 </launch>
