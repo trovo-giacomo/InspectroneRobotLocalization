@@ -12,12 +12,12 @@ from tf.transformations import quaternion_from_matrix, translation_from_matrix, 
 
 if __name__ == '__main__':
         
+    rospy.init_node("publish_camera_tf_from_yaml")
     file_path = rospy.get_param("yaml_file_path")
     reference_frame = rospy.get_param("reference_frame")
     child_frame = rospy.get_param("child_frame")
     num_cameras = rospy.get_param("num_cameras")
     print("FILE PATH",file_path)
-    rospy.init_node("publish_camera_tf_from_yaml")
     static_transforms = []
     I = np.identity(4)
     T_all = [I]

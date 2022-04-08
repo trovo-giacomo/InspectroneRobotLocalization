@@ -57,12 +57,12 @@ def buildStaticTransform(transform, base_frame, child_frame):
 
 if __name__ == '__main__':
     ## read parameter from the launch file
-    imu_file_path = rospy.get_param("imu_cam_calib_path")
-    cam_file_path = rospy.get_param("cam_cam_calib_path")
-    base_frame = rospy.get_param("base_frame")
-    child_frame = rospy.get_param("child_frame_prefix")
-    num_cameras = rospy.get_param("num_cameras")
     rospy.init_node("publish_cameras_tf_from_yaml")
+    imu_file_path = rospy.get_param("~imu_cam_calib_path")
+    cam_file_path = rospy.get_param("~cam_cam_calib_path")
+    base_frame = rospy.get_param("~base_frame")
+    child_frame = rospy.get_param("~child_frame_prefix")
+    num_cameras = rospy.get_param("~num_cameras")
     I = [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0],[0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
     ## load imu_camera yaml file and read transformation imu to cam0 
     T_cam_imu = getTransformation(imu_file_path, "cam0", "T_cam_imu")
