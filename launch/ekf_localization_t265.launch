@@ -1,0 +1,29 @@
+<launch>
+    <!-- Launch a bag with the three camera odometry topic or launch the 3 rs t265 cameras -->
+    <arg name="input_bag_name" default="localization_v3.bag" />
+    <param name="use_sim_time" value="true" />
+    <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/localization/$(arg input_bag_name) --clock"/>
+    <!-- Include file for launching the t265 cameras -->
+    <!--<include file="$(find InspectroneRobotLocalization)/launch/launch_t265.xml">-->
+   
+    <!-- include node that publish all the static tf-->
+    <include file="$(find InspectroneRobotLocalization)/launch/publish_cameras_tf_inspectrone.xml" />
+    
+    <!-- include Robot localization node -->
+    <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone.xml" />
+
+    <!-- Launch node for preparing data for EKF in robot localization - one for each camera -->
+    <!-- args:
+            prefix of the camera topic for realsense t265
+            base_link frame name relative to the camera#_pose_frame
+            new topic prefix name for the new odometry
+            name of the node
+    -->
+    <node name="odom1_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera1 base_link_1 cam1 publish_odom1" />    
+    <node name="odom2_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera2 base_link_2 cam2 publish_odom2" />
+    <node name="odom3_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera3 base_link_3 cam3 publish_odom3" />
+
+    <!-- RVIZ visulization -->
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find InspectroneRobotLocalization)/rviz/ekf_localization_odom.rviz"/>
+
+</launch>

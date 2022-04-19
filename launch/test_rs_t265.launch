@@ -113,7 +113,7 @@
       <arg name="publish_odom_tf"          value="true"/>
       <arg name="initial_reset"          value="true"/>
       <arg name="camera"                   value="camera2"/>
-      <arg name="serial_no"            value="144222110422" />
+      <arg name="serial_no"            value="144222110947" />
 
       <!--<arg name="odom_frame_id"            value="odom"/>-->
       <!--<arg name="base_frame_id"            value="base_link"/>-->
