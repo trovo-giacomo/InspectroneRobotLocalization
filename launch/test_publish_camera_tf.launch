@@ -36,7 +36,9 @@
         <param name="num_cameras" type="int" value="2" /> 
         <param name="publish_cameras_tf" value="false" />
         <param name="publish_odom_tf" value="true" />
+        <param name="offset_x_degree" value="0.0" />
         <param name="offset_y_degree" value="0.0" />
+        <param name="offset_z_degree" value="0.0" />
     </node>
     <!-- Camera 2 - front -->
     <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera2" output="screen">
@@ -47,7 +49,9 @@
         <param name="num_cameras" type="int" value="2" /> 
         <param name="publish_cameras_tf" value="false" />
         <param name="publish_odom_tf" value="true" />
+        <param name="offset_x_degree" value="0.0" />
         <param name="offset_y_degree" value="0.0" />
+        <param name="offset_z_degree" value="0.0" />
     </node>
     <!-- Camera 3 - bottom -->
     <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera3" output="screen">
@@ -58,7 +62,9 @@
         <param name="num_cameras" type="int" value="2" /> 
         <param name="publish_cameras_tf" value="false" />
         <param name="publish_odom_tf" value="true" />
+        <param name="offset_x_degree" value="0.0" />
         <param name="offset_y_degree" value="0.0" />
+        <param name="offset_z_degree" value="0.0" />
     </node>
 
 </launch>

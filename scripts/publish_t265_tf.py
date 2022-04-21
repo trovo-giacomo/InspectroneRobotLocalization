@@ -69,6 +69,7 @@ if __name__ == '__main__':
     offset_x_degree = float(rospy.get_param("~offset_x_degree"))
     offset_y_degree = float(rospy.get_param("~offset_y_degree"))
     offset_z_degree = float(rospy.get_param("~offset_z_degree"))
+    camera_orientation = str(rospy.get_param("~camera_orientation"))
     I = np.identity(4)
     T_rot_offset = euler_matrix(0, math.radians(offset_y_degree), 0)
     
@@ -88,13 +89,24 @@ if __name__ == '__main__':
         t_cam1_cam2 = t_cam2 - t_cam1
         # get vector from fisheye camera 1 to the middle point of the previous vector (odometry reference)
         t_cam_odom = t_cam1_cam2 / 2
-        # buil rotation matrix to translate from camera rf to odometry rf -> rotation about x axes  of 180 degrees
-        T_rot_y = euler_matrix(0, -math.pi/2, 0)
-        T_rot_z = euler_matrix(0, 0, math.pi/2)
-        T_rot_x = euler_matrix(math.pi, 0, 0)
+        # build rotation matrix to translate from camera rf to odometry rf
+        # if(camera_orientation == "top" or camera_orientation == "front"):
+        #     # align to the reference frame: xyz:        odom frame
+        #     #          z                                     z y
+        #     #          |__                                   |/__ 
+        #     #         /    y                                      x
+        #     #        x 
+        #     
+        # else: # bottom
+        #     # align to the reference frame: xyz:
+        #     #          z x
+        #     #        __|/
+        #     #       y
+        #     
+        #
         T_rot = euler_matrix(math.radians(offset_x_degree), math.radians(offset_y_degree), math.radians(offset_z_degree))
-        # build homogeneous transformation between IMU and the just calculated odometry reference = T_imu_camera1 * T_cam_odom * T_rot_z_90 * T_rot_y_-90
-        #T_imu_cam_odom = concatenate_matrices(translation_matrix(t_cam_odom), T_imu_cams[0])
+        # build homogeneous transformation between IMU and the just calculated odometry reference = T_imu_camera1 * T_cam_odom * T_rot_to_odom_frame
+        #T_imu_cam_odom = concatenate_matrices(translation_matrix(t_cam_odom), T_imu_cams[0]) # reference frame in the optical frame
         T_imu_cam_odom = concatenate_matrices(translation_matrix(t_cam_odom), T_imu_cams[0], T_rot)
         #T_imu_cam_odom = concatenate_matrices(translation_matrix(t_cam_odom), T_imu_cams[0], T_rot_z, T_rot_y)
 
@@ -114,9 +126,8 @@ if __name__ == '__main__':
     if(is_pub_odom_tf and num_cameras==2):
         T_static_imu_camera_odom = buildStaticTransform(T_imu_cam_odom, base_frame, camera_prefix + "_frame") # T imu -> camera_frame
         T_odom_camera_odometry = T_imu_cam_odom
-        #T_static_odom_camera_odom = buildStaticTransform(T_odom_camera_odometry, odom_frame, camera_prefix + "_odom_frame") # T odom -> camera_odom_frame
         T_static_odom_camera_odom = buildStaticTransform(T_odom_camera_odometry, odom_frame, camera_prefix + "_odom_frame") # T odom -> camera_odom_frame
-        T_pose_base_link = np.linalg.inv(T_odom_camera_odometry)
+        T_pose_base_link = np.linalg.inv(T_imu_cam_odom)
         T_static_pose_base_link  = buildStaticTransform(T_pose_base_link, camera_prefix + "_pose_frame", "/base_link_"+str(camera_prefix[-1])) # T camera_pose_frame -> base_link
         # stack all the transforomation in a list
         static_transforms.append(T_static_imu_camera_odom)

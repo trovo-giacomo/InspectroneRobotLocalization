@@ -1,6 +1,6 @@
 <launch>
     <!-- Launch a bag with the three camera odometry topic or launch the 3 rs t265 cameras -->
-    <arg name="input_bag_name" default="localization_v3.bag" />
+    <arg name="input_bag_name" default="cameras_manual_flight_4.bag" />
     <param name="use_sim_time" value="true" />
     <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/localization/$(arg input_bag_name) --clock"/>
     <!-- Include file for launching the t265 cameras -->

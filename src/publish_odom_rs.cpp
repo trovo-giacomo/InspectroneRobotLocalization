@@ -98,15 +98,15 @@ void transformTwist(geometry_msgs::TwistWithCovariance msg_twist, geometry_msgs:
 void inflateLinVelCovariance(geometry_msgs::TwistWithCovariance twist, geometry_msgs::TwistWithCovariance& new_twist_cov){
     //static float prev_cov = 0.1;
     //float kDeltaCovariance = pose.covariance[0] / prev_cov;
-    static float cov_unaccurate = 0.1, kInflate = 10.0, eps=0.01, eps2 = 0.01;
+    static float cov_unaccurate = 0.1, kInflate = 1.0, eps=0.01, eps2 = 0.01;
     new_twist_cov = twist;
     float sum_linear_twist = abs(twist.twist.linear.x) + abs(twist.twist.linear.y) + abs(twist.twist.linear.z);
     //threshold velocity - in order to not increase the ekf covariance if drone is steady
-    if(sum_linear_twist < eps2){
-        new_twist_cov.twist.linear.x = 0;
-        new_twist_cov.twist.linear.y = 0;
-        new_twist_cov.twist.linear.z = 0;
-    }
+    // if(sum_linear_twist < eps2){
+    //     new_twist_cov.twist.linear.x = 0;
+    //     new_twist_cov.twist.linear.y = 0;
+    //     new_twist_cov.twist.linear.z = 0;
+    // }
     //if(abs(twist.covariance[0] - cov_unaccurate) < eps){
     new_twist_cov.covariance[0] = twist.covariance[0] * kInflate;
     new_twist_cov.covariance[7] = twist.covariance[7] * kInflate;
@@ -185,6 +185,7 @@ int main(int argc, char **argv) {
     ros::NodeHandle n;
     string topic_pub = "/"+prefix_odom + "/odom/sample_throttled";
     string topic_sub = "/"+camera+"/odom/sample_throttled";
+    //string topic_sub = "/"+camera+"/odom/sample";
     
     //init static transform
     tf::TransformListener listener;
