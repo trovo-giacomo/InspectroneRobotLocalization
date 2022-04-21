@@ -46,8 +46,9 @@
         <!-- mahalanobis distance threshold for odom0 and odom1 -->
         <!--<param name="odom0_pose_rejection_threshold" value="5" />
         <param name="odom1_pose_rejection_threshold" value="5" />-->
-        <!--<param name="odom0_twist_rejection_threshold" value="10" />
-        <param name="odom1_twist_rejection_threshold" value="10" />-->
+        <param name="odom0_twist_rejection_threshold" value="10" />
+        <param name="odom1_twist_rejection_threshold" value="10" />
+        <param name="odom2_twist_rejection_threshold" value="10" />
 
         <param name="odom0_relative" value="false" />
         <param name="odom1_relative" value="false" />
