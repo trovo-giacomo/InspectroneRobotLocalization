@@ -1,6 +1,7 @@
 <launch>
     <!-- Launch a bag with the three camera odometry topic or launch the 3 rs t265 cameras -->
     <arg name="input_bag_name" default="cameras_manual_flight_4.bag" />
+    <arg name="is_ekf_differential" default="true" />
     <param name="use_sim_time" value="true" />
     <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/localization/$(arg input_bag_name) --clock"/>
     <!-- Include file for launching the t265 cameras -->
@@ -10,7 +11,9 @@
     <include file="$(find InspectroneRobotLocalization)/launch/publish_cameras_tf_inspectrone.xml" />
     
     <!-- include Robot localization node -->
-    <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone.xml" />
+
+    <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_position_inspectrone.xml" if="$(arg is_ekf_differential)"/>
+    <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone.xml" unless="$(arg is_ekf_differential)"/>
 
     <!-- Launch node for preparing data for EKF in robot localization - one for each camera -->
     <!-- args:
@@ -23,7 +26,12 @@
     <node name="odom2_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera2 base_link_2 cam2 publish_odom2" />
     <node name="odom3_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera3 base_link_3 cam3 publish_odom3" />
 
+    <node name="transform_rl_odom" output="screen" pkg="InspectroneRobotLocalization" type="transform_rl_odometry" required="true">
+        <param name="differential" type="bool" value="$(arg is_ekf_differential)" />
+        <param name="odom_in_topic" type="string" value="/odometry/filtered" />
+        <param name="odom_out_topic" type="string" value="/odometry/fused" />
+    </node>
+
     <!-- RVIZ visulization -->
     <node type="rviz" name="rviz" pkg="rviz" args="-d $(find InspectroneRobotLocalization)/rviz/ekf_localization_odom.rviz"/>
-
 </launch>

@@ -28,8 +28,9 @@ void transformPose(geometry_msgs::PoseWithCovariance p_camOdo_pose, geometry_msg
     //cout << ".3 Transform from odom to base_link" << endl;
     // compose transformation odom <-> camera_pose_frame (+) camera_pose_frame <-> base_link = odom <-> base_link
     pose_cov_ops::compose(p_odom_camPose, p_camPose_bl, p_odom_bl);
+    //pose_cov_ops::compose(p_camOdo_pose, p_camPose_bl, p_odom_bl);
     //inflate covariance of orientation
-    float kCovaraince = 10; //infalse covariance constant
+    float kCovaraince = 100; //infalse covariance constant
     p_odom_bl.covariance[21] = p_odom_bl.covariance[21] * kCovaraince;
     //p_odom_bl.covariance[22] = p_odom_bl.covariance[22] * kCovaraince;
     //p_odom_bl.covariance[23] = p_odom_bl.covariance[23] * kCovaraince;
@@ -47,7 +48,8 @@ void transformTwist(geometry_msgs::TwistWithCovariance msg_twist, geometry_msgs:
     tf::Vector3 linear_vel, new_linear_vel;
     tf::Vector3 new_angular_vel;
     // get rotation between base_link and cam_pose frame
-    tf::Matrix3x3 rot_camPose_bl = t_cameraPose_bl.getBasis().transpose(); // get rotation matrix
+    //tf::Matrix3x3 rot_camPose_bl = t_cameraPose_bl.getBasis().transpose(); // get rotation matrix
+    tf::Matrix3x3 rot_camPose_bl = t_cameraPose_bl.getBasis().inverse(); // get rotation matrix
     // convert Vector3 from geometry message to tf
     linear_vel.setX(msg_twist.twist.linear.x);
     linear_vel.setY(msg_twist.twist.linear.y);
@@ -125,7 +127,7 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     p_camOdo_pose = msg->pose;
     
     // Transform Pose from camera_odom <-> camera_pose to odom <-> base_link
-    transformPose(p_camOdo_pose, p_odom_bl);
+    transformPose(p_camOdo_pose, p_odom_bl); // TODO: Commenter for TEST  to see if differential works better
     if(isnan(p_odom_bl.pose.position.x) || isnan(p_odom_bl.pose.position.y) || isnan(p_odom_bl.pose.position.z) || isnan(p_odom_bl.pose.orientation.x) || isnan(p_odom_bl.pose.orientation.y) || isnan(p_odom_bl.pose.orientation.z) || isnan(p_odom_bl.pose.orientation.w) ){
         // at least one element in the transformation is nan - dropping transform
         cout << "Nan values in the transformation of the pose in " << camera << endl;        
@@ -147,12 +149,15 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
 
     // prepare the new Odometry message
     //cout << ".4 Build new message" << endl;
-    //string child_frame = prefix_odom + "_link_frame";
+    //string child_frame = camera + "_frame";
     string child_frame = "base_link";
+    string new_frame_id = "odom";
+    //string new_frame_id =  camera + "_odom_frame";
     nav_msgs::Odometry transformed_odom = *msg;
     transformed_odom.pose = p_odom_bl; // fill in the pose with covariance the transfromed pose
     transformed_odom.twist = new_twist_cov; // fill in the rotated twist + inflate/deflated covariance
-    transformed_odom.header.frame_id = "odom";    //reference frame
+    //transformed_odom.twist = msg_twist; // fill in the original twist
+    transformed_odom.header.frame_id = new_frame_id;    //reference frame
     transformed_odom.child_frame_id = child_frame.c_str(); //child frame
 
     //cout << ".5 Now publish the converted message" << endl;
