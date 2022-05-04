@@ -36,7 +36,7 @@
     <arg name="reconnect_timeout"         default="5.0"/>
 
 
-    <include file="t265.launch" >
+    <include file="$(find InspectroneRobotLocalization)/launch/t265.launch" >
         <arg name="serial_no"             value="$(arg serial_no_camera1)"/>
         <arg name="tf_prefix"         		value="$(arg tf_prefix_camera1)"/>
         <arg name="initial_reset"         value="$(arg initial_reset)"/>
@@ -58,7 +58,7 @@
     </include>
 
 
-    <include file="t265.launch" >
+    <include file="$(find InspectroneRobotLocalization)/launch/t265.launch" >
         <arg name="serial_no"             value="$(arg serial_no_camera2)"/>
         <arg name="tf_prefix"		          value="$(arg tf_prefix_camera2)"/>
         <arg name="initial_reset"         value="$(arg initial_reset)"/>
@@ -79,7 +79,7 @@
         <arg name="publish_tf"                value="true" />
     </include>
 
-    <include file="t265.launch" >
+    <include file="$(find InspectroneRobotLocalization)/launch/t265.launch" >
         <arg name="serial_no"             value="$(arg serial_no_camera3)"/>
         <arg name="tf_prefix"		          value="$(arg tf_prefix_camera3)"/>
         <arg name="initial_reset"         value="$(arg initial_reset)"/>
