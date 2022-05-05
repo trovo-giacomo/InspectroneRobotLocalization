@@ -28,7 +28,6 @@ void transformPose(geometry_msgs::PoseWithCovariance p_camOdo_pose, geometry_msg
     //cout << ".3 Transform from odom to base_link" << endl;
     // compose transformation odom <-> camera_pose_frame (+) camera_pose_frame <-> base_link = odom <-> base_link
     pose_cov_ops::compose(p_odom_camPose, p_camPose_bl, p_odom_bl);
-    //pose_cov_ops::compose(p_camOdo_pose, p_camPose_bl, p_odom_bl);
     //inflate covariance of orientation
     float kCovaraince = 100; //infalse covariance constant
     p_odom_bl.covariance[21] = p_odom_bl.covariance[21] * kCovaraince;
@@ -102,7 +101,7 @@ void inflateLinVelCovariance(geometry_msgs::TwistWithCovariance twist, geometry_
     //float kDeltaCovariance = pose.covariance[0] / prev_cov;
     static float cov_unaccurate = 0.1, kInflate = 1.0, eps=0.01, eps2 = 0.01;
     new_twist_cov = twist;
-    float sum_linear_twist = abs(twist.twist.linear.x) + abs(twist.twist.linear.y) + abs(twist.twist.linear.z);
+    //float sum_linear_twist = abs(twist.twist.linear.x) + abs(twist.twist.linear.y) + abs(twist.twist.linear.z);
     //threshold velocity - in order to not increase the ekf covariance if drone is steady
     // if(sum_linear_twist < eps2){
     //     new_twist_cov.twist.linear.x = 0;
@@ -127,7 +126,7 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     p_camOdo_pose = msg->pose;
     
     // Transform Pose from camera_odom <-> camera_pose to odom <-> base_link
-    transformPose(p_camOdo_pose, p_odom_bl); // TODO: Commenter for TEST  to see if differential works better
+    transformPose(p_camOdo_pose, p_odom_bl);
     if(isnan(p_odom_bl.pose.position.x) || isnan(p_odom_bl.pose.position.y) || isnan(p_odom_bl.pose.position.z) || isnan(p_odom_bl.pose.orientation.x) || isnan(p_odom_bl.pose.orientation.y) || isnan(p_odom_bl.pose.orientation.z) || isnan(p_odom_bl.pose.orientation.w) ){
         // at least one element in the transformation is nan - dropping transform
         cout << "Nan values in the transformation of the pose in " << camera << endl;        
@@ -157,7 +156,7 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     transformed_odom.pose = p_odom_bl; // fill in the pose with covariance the transfromed pose
     transformed_odom.twist = new_twist_cov; // fill in the rotated twist + inflate/deflated covariance
     //transformed_odom.twist = msg_twist; // fill in the original twist
-    transformed_odom.header.frame_id = new_frame_id;    //reference frame
+    transformed_odom.header.frame_id = new_frame_id.c_str();    //reference frame
     transformed_odom.child_frame_id = child_frame.c_str(); //child frame
 
     //cout << ".5 Now publish the converted message" << endl;
