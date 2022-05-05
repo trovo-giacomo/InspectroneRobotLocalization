@@ -1,36 +1,70 @@
 <launch>
     <!-- Launch a bag with the three camera odometry topic or launch the 3 rs t265 cameras -->
     <arg name="input_bag_name" default="cameras_manual_flight_4.bag" />
-    <arg name="is_ekf_differential" default="true" />
+
+    <arg name="odom0_differential" default="true" />
+    <arg name="odom1_differential" default="true" />
+    <arg name="odom2_differential" default="true" />
+
+    
     <param name="use_sim_time" value="true" />
     <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/localization/$(arg input_bag_name) --clock"/>
     <!-- Include file for launching the t265 cameras -->
     <!--<include file="$(find InspectroneRobotLocalization)/launch/launch_t265.xml">-->
    
     <!-- include node that publish all the static tf-->
-    <include file="$(find InspectroneRobotLocalization)/launch/publish_cameras_tf_inspectrone.xml" />
+    <include file="$(find InspectroneRobotLocalization)/launch/publish_cameras_tf_inspectrone.xml" >
+        <arg name="camera1_differential" value="$(arg odom0_differential)" />
+        <arg name="camera2_differential" value="$(arg odom1_differential)" />
+        <arg name="camera3_differential" value="$(arg odom2_differential)" />
+    </include>
     
     <!-- include Robot localization node -->
 
-    <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_position_inspectrone.xml" if="$(arg is_ekf_differential)"/>
-    <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone.xml" unless="$(arg is_ekf_differential)"/>
+    <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone.xml">
+        <arg name="odom0_differential" value="$(arg odom0_differential)" />
+        <arg name="odom1_differential" value="$(arg odom1_differential)" />
+        <arg name="odom2_differential" value="$(arg odom2_differential)" />
+    </include>
+    <!-- <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone.xml" unless="$(arg is_ekf_differential)"/> -->
 
     <!-- Launch node for preparing data for EKF in robot localization - one for each camera -->
     <!-- args:
             prefix of the camera topic for realsense t265
             base_link frame name relative to the camera#_pose_frame
             new topic prefix name for the new odometry
-            name of the node
+            isDifferential - whether is robot_localization this odometry topic is used with the parameter differential=true
     -->
-    <node name="odom1_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera1 base_link_1 cam1 publish_odom1" />    
-    <node name="odom2_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera2 base_link_2 cam2 publish_odom2" />
-    <node name="odom3_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera3 base_link_3 cam3 publish_odom3" />
+    <node name="odom0_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true">
+        <param name="camera" type="str" value="camera1" />
+        <param name="base_link" type="str" value="base_link_1" />
+        <param name="prefix_odom" value="cam1" />
+        <param name="differential" type="bool" value="$(arg odom0_differential)" />
+    </node>
+        
+    <node name="odom1_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true">
+        <param name="camera" type="str" value="camera2" />
+        <param name="base_link" type="str" value="base_link_2" />
+        <param name="prefix_odom" value="cam2" />
+        <param name="differential" type="bool" value="$(arg odom1_differential)" />
+    </node>
 
-    <node name="transform_rl_odom" output="screen" pkg="InspectroneRobotLocalization" type="transform_rl_odometry" required="true">
+    <node name="odom2_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true">
+        <param name="camera" type="str" value="camera3" />
+        <param name="base_link" type="str" value="base_link_3" />
+        <param name="prefix_odom" value="cam3" />
+        <param name="differential" type="bool" value="$(arg odom2_differential)" />
+    </node>
+
+    <!-- <node name="odom1_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera1 base_link_1 cam1 publish_odom1" />    
+    <node name="odom2_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera2 base_link_2 cam2 publish_odom2" />
+    <node name="odom3_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera3 base_link_3 cam3 publish_odom3" /> -->
+
+    <!-- <node name="transform_rl_odom" output="screen" pkg="InspectroneRobotLocalization" type="transform_rl_odometry" required="true">
         <param name="differential" type="bool" value="$(arg is_ekf_differential)" />
         <param name="odom_in_topic" type="string" value="/odometry/filtered" />
         <param name="odom_out_topic" type="string" value="/odometry/fused" />
-    </node>
+    </node> -->
 
     <!-- RVIZ visulization -->
     <node type="rviz" name="rviz" pkg="rviz" args="-d $(find InspectroneRobotLocalization)/rviz/ekf_localization_odom.rviz"/>

@@ -50,3 +50,4 @@ qtcreator-*
 # Catkin custom files
 CATKIN_IGNORE
 typescript
+rviz/box_odom_visualization.rviz
