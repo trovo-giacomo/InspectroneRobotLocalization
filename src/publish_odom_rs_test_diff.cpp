@@ -56,7 +56,7 @@ void transformTwist(geometry_msgs::TwistWithCovariance msg_twist, geometry_msgs:
     // get rotation between base_link and cam_pose frame
     //tf::Matrix3x3 rot_camPose_bl = t_cameraPose_bl.getBasis().transpose(); // get rotation matrix
     tf::Matrix3x3 rot_camPose_bl = t_cameraPose_bl.getBasis().inverse(); // get rotation matrix
-    tf::Vector3 trans_camPose_bl = -t_cameraPose_bl.inverse().getOrigin();
+    tf::Vector3 trans_camPose_bl = t_cameraPose_bl.inverse().getOrigin();
     // convert Vector3 from geometry message to tf
     linear_vel.setX(msg_twist.twist.linear.x);
     linear_vel.setY(msg_twist.twist.linear.y);
