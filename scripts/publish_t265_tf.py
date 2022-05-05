@@ -114,7 +114,12 @@ if __name__ == '__main__':
         # apply a rotation of 90 deg around x-axis followed by a rotation of 90 deg around the z-axis to transform from optical_frame to pose_frame
         T_rot = euler_matrix(0.0, -math.pi/2, math.pi/2)
         T_imu_cam_pose = concatenate_matrices(T_imu_cam_optical, T_rot) # transform between imu and camera_pose_frame
-        T_imu_cam_odom = T_imu_cam_pose
+        
+        ## ---- try to create the same transform from odom to camera_odom_frame as it was not differential
+        T_rot = euler_matrix(math.radians(offset_x_degree), math.radians(offset_y_degree), math.radians(offset_z_degree))
+        # build homogeneous transformation between IMU and the just calculated odometry reference = T_imu_camera1 * T_cam_odom * T_rot_to_odom_frame
+        T_imu_cam_odom = concatenate_matrices(T_imu_cam_optical, T_rot)
+        #T_imu_cam_odom = T_imu_cam_pose
     else:
         print("NOT differential ", camera_prefix)
         # build transformation to align the optical frame to the camera_odometry_frame
@@ -123,6 +128,10 @@ if __name__ == '__main__':
         T_imu_cam_odom = concatenate_matrices(T_imu_cam_optical, T_rot)
         #T_imu_cam_odom = concatenate_matrices( translation_matrix(t_cam_odom), T_imu_cams[0], T_rot, T_rot_temp)
         #T_imu_cam_odom = concatenate_matrices(translation_matrix(t_cam_odom), T_imu_cams[0], T_rot_z, T_rot_y)
+
+        ## -------- TEST -----------
+        T_rot = euler_matrix(0.0, -math.pi/2, math.pi/2)
+        T_imu_cam_pose = concatenate_matrices(T_imu_cam_optical, T_rot) # transform between imu and camera_pose_frame
 
     ## publish transformations as TF static transfroms
     broadcaster = tf2_ros.StaticTransformBroadcaster()
@@ -155,10 +164,12 @@ if __name__ == '__main__':
         #---- T camera_pose_frame -> base_link ----#
         if(is_differential):
             T_rot_z = euler_matrix(0.0, 0.0, math.pi/2)
-            T_pose_base_link = np.linalg.inv(T_imu_cam_odom)
+            # T_imu_cam_pose is the transformation from base_link to camera_pose
+            T_pose_base_link = np.linalg.inv(T_imu_cam_pose)
             T_pose_base_link = concatenate_matrices(T_pose_base_link, T_rot_z)
         else:
-            T_pose_base_link = np.linalg.inv(T_imu_cam_odom)
+            #T_pose_base_link = np.linalg.inv(T_imu_cam_odom)
+            T_pose_base_link = np.linalg.inv(T_imu_cam_pose)
         # T_pose_base_link[0,3] = 0
         # T_pose_base_link[1,3] = 0
         # T_pose_base_link[2,3] = 0

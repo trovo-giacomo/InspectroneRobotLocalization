@@ -33,7 +33,10 @@ void transformPose(geometry_msgs::PoseWithCovariance p_camOdo_pose, geometry_msg
     }
     else{
         // compose transformation camera_odom_frame <-> camera_pose_frame (+) camera_pose_frame <-> base_link = camera_odom_frame <-> base_link
-        pose_cov_ops::compose(p_camOdo_pose, p_camPose_bl, p_odom_bl);
+        //pose_cov_ops::compose(p_camOdo_pose, p_camPose_bl, p_odom_bl);
+        pose_cov_ops::compose(p_odom_camOdo, p_camOdo_pose,  p_odom_camPose);
+        // compose transformation odom <-> camera_pose_frame (+) camera_pose_frame <-> base_link = odom <-> base_link
+        pose_cov_ops::compose(p_odom_camPose, p_camPose_bl, p_odom_bl);
         kCovaraince = 1; //inflate covariance constant - No need for now to inflate it
     }
 
@@ -127,7 +130,8 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     string new_frame_id;
     if(isDifferential){
         // as I haven't transform from odom to camera_odom_frame this need to be done by robot_loclaization so the frame_id of the odometry message is:
-        new_frame_id =  camera + "_odom_frame";
+        //new_frame_id =  camera + "_odom_frame";
+        new_frame_id =  "odom";
     }
     else{
         // everything is transformed to be in the odom frame so the frame_id of the odometry message is:
