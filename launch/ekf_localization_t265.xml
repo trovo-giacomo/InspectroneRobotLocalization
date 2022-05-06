@@ -11,15 +11,22 @@
             prefix of the camera topic for realsense t265
             base_link frame name relative to the camera#_pose_frame
             new topic prefix name for the new odometry
-            name of the node
     -->
-    <node name="odom1_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera1 base_link_1 cam1 publish_odom1" />    
-    <node name="odom2_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera2 base_link_2 cam2 publish_odom2" />
-    <node name="odom3_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true" args="camera3 base_link_3 cam3 publish_odom3" />
+    <node name="odom0_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true">
+        <param name="camera" type="str" value="camera1" />
+        <param name="base_link" type="str" value="base_link_1" />
+        <param name="prefix_odom" value="cam1" />
+    </node>
+        
+    <node name="odom1_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true">
+        <param name="camera" type="str" value="camera2" />
+        <param name="base_link" type="str" value="base_link_2" />
+        <param name="prefix_odom" value="cam2" />
+    </node>
 
-    <node name="transform_rl_odom" output="screen" pkg="InspectroneRobotLocalization" type="transform_rl_odometry" required="true">
-        <param name="differential" type="bool" value="false" />
-        <param name="odom_in_topic" type="string" value="/odometry/filtered" />
-        <param name="odom_out_topic" type="string" value="/odometry/fused" />
+    <node name="odom2_tf_listener" output="screen" pkg="InspectroneRobotLocalization" type="publish_odom_rs" required="true">
+        <param name="camera" type="str" value="camera3" />
+        <param name="base_link" type="str" value="base_link_3" />
+        <param name="prefix_odom" value="cam3" />
     </node>
 </launch>
