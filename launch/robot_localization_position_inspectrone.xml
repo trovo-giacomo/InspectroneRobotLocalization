@@ -1,0 +1,176 @@
+<launch>
+    <node name="ekf_odom" pkg="robot_localization" type="ekf_localization_node" clear_params="true" required="true">
+        <param name="sensor_timeout" value="1.0"/>
+        <!--param name="map_frame" value="map" /-->
+        <param name="odom_frame" value="odom" />
+        <param name="base_link_frame" value="base_link" />
+        <param name="world_frame" value="odom" />
+
+        <param name="frequency" value="20" />
+        <!-- <param name="transform_time_offset" value="0.5"/>   inverse of frequency of EKF -->
+
+        <param name="odom0" value="/cam1/odom/sample_throttled" />
+        <!-- <param name="odom1" value="/cam2/odom/sample_throttled" />
+        <param name="odom2" value="/cam3/odom/sample_throttled" /> -->
+        <!-- <param name="imu0"  value="/mavros/imu/data" /> -->
+
+        <!-- X,Y,Z,roll,pitch,yaw,X˙,Y˙,Z˙,roll˙,pitch˙,yaw˙,X¨,Y¨,Z¨)-->
+        <rosparam param="odom0_config">[true, true, true,
+                                        true, true, true,
+                                        false, false, false,
+                                        false, false, false,
+                                        false, false, false]</rosparam>
+
+        <!-- <rosparam param="odom1_config">[true, true, true,
+                                        true, true, true,
+                                        false, false, false,
+                                        false, false, false,
+                                        false, false, false]</rosparam> -->
+        <!-- <rosparam param="odom2_config">[true, true, true,
+                                        true, true, true,
+                                        false, false, false,
+                                        false, false, false,
+                                        false, false, false]</rosparam> -->
+
+        <!-- <rosparam param="imu0_config">[false, false, false,
+                                        false, false, false,
+                                        false, false, false,
+                                        true, true, true,
+                                        true, true, true]</rosparam> -->
+
+        <param name="odom0_differential" value="true" />
+        <!-- <param name="odom1_differential" value="true" />
+        <param name="odom2_differential" value="true" /> -->
+        <!-- <param name="imu0_differential" value="true" /> -->
+        <!-- mahalanobis distance threshold for odom0 and odom1 -->
+        <!--<param name="odom0_pose_rejection_threshold" value="5" />
+        <param name="odom1_pose_rejection_threshold" value="5" />-->
+        <!-- <param name="odom0_twist_rejection_threshold" value="10" />
+        <param name="odom1_twist_rejection_threshold" value="10" />
+        <param name="odom2_twist_rejection_threshold" value="10" /> -->
+
+        <param name="odom0_relative" value="false" />
+        <!-- <param name="odom1_relative" value="false" />
+        <param name="odom2_relative" value="false" /> -->
+        <!-- <param name="imu0_relative" value="false" /> -->
+
+        <param name="odom0_queue_size" value="50" />
+        <!-- <param name="odom1_queue_size" value="50" />
+        <param name="odom2_queue_size" value="50" /> -->
+        <!-- <param name="imu0_queue_size" value="50" /> -->
+
+        <param name="print_diagnostics" value="true"/>
+
+        <param name="debug"           value="true"/>
+        <param name="debug_out_file"  value="debug_ekf_localization.txt"/>
+        <!-- If set to true will not run the filter on start. -->
+        <!--<param name="disabled_at_startup" value="true" />-->
+        
+        <!-- If true, will dynamically scale the process_noise_covariance based on the robot’s velocity. This is useful, e.g., when you want your robot’s estimate error covariance to stop growing when the robot is stationary.-->
+        <param name="dynamic_process_noise_covariance" value="true" />
+
+        <!-- The process noise covariance, commonly denoted Q, is used to model uncertainty in the prediction stage of the filtering algorithms. In general, the larger the value for Q relative to the variance for a given variable in an input message, the faster the filter will converge to the value in the measurement.-->
+        <!-- UKF param - trials -->
+        <!--<rosparam param="process_noise_covariance">[1e-9, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    1e-9, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    1e-9, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    5e-1 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    5e-1, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    5e-1, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    5e-1,  0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     5e-1,  0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     5e-1, 0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-9, 0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-9, 0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-9, 0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-9, 0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-9, 0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-9]</rosparam>-->
+            <!-- EKF param - trials -->
+            <rosparam param="process_noise_covariance">[1e-3,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    1e-3,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    1e-3,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    1e-3,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    1e-3,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    1e-3,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    1e-1,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     1e-1,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     1e-1,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-1,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-1,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-1,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-12,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-12,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-12]   </rosparam>
+            <!--
+            <rosparam param="process_noise_covariance">[1e-6, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    1e-6, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    1e-6, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    1e-1 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    1e-1, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    1e-1, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    1e-2,  0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     1e-2,  0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     1e-2, 0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-7, 0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-7, 0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-7, 0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-7, 0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-7,  0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-7]</rosparam>
+            -->
+            <!-- <rosparam param="process_noise_covariance">[5e-1, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    5e-1, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    5e-1, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    1e-1 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    1e-1, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    1e-1, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    5e-1,  0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     5e-1,  0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     5e-1, 0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-12,0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-12,0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-12,0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-12,0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-12,0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-12]</rosparam> -->
+        <!-- Trial with 200 hz odom topic -->
+        <!-- <rosparam param="process_noise_covariance">[1e-20, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    1e-20, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    1e-20, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    1e-5 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    1e-5, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    1e-5, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    1e-10,  0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     1e-10,  0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     1e-10, 0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-20, 0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-20, 0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-20, 0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-20, 0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-20, 0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-20]</rosparam> -->
+        <!-- Initial state -->
+        <rosparam param="initial_state">[0.0,  0.0,  0.0,
+                                         0.0,  0.0,  0.0,
+                                         0.0,  0.0,  0.0,
+                                         0.0,  0.0,  0.0,
+                                         0.0,  0.0,  0.0]</rosparam>
+        <!-- <rosparam param="initial_estimate_covariance">[ 1e-2,  0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    1e-2,  0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    1e-2,  0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    1e-2 , 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    1e-2,  0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    1e-2,  0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    1e-1,  0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     1e-1,  0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     1e-1, 0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-1, 0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-1, 0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-1, 0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-9, 0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-9, 0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-9 ]</rosparam> -->
+    </node>
+
+</launch>

@@ -212,5 +212,11 @@ include_directories(
 
 add_executable(publish_odom_rs src/publish_odom_rs.cpp)
 target_link_libraries(publish_odom_rs ${catkin_LIBRARIES})
-#add_dependencies(publish_odom1 geometry_msgs pos_cov_ops)
+#add_dependencies(publish_odom geometry_msgs pos_cov_ops)
+
+add_executable(publish_odom_rs_test_diff src/publish_odom_rs_test_diff.cpp)
+target_link_libraries(publish_odom_rs_test_diff ${catkin_LIBRARIES})
+
+add_executable(transform_rl_odometry src/transform_rl_odometry.cpp)
+target_link_libraries(transform_rl_odometry ${catkin_LIBRARIES})
 

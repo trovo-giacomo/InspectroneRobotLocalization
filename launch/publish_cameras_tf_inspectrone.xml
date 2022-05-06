@@ -6,12 +6,8 @@
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
         <param name="prefix_camera_tf" type="str" value="/camera1" />
-        <param name="num_cameras" type="int" value="2" /> 
         <param name="publish_cameras_tf" value="false" />
         <param name="publish_odom_tf" value="true" />
-        <param name="offset_x_degree" value="0.0" />
-        <param name="offset_y_degree" value="0.0" />
-        <param name="offset_z_degree" value="0.0" />
         <param name="camera_orientation" value="top" />
     </node>
     <!-- Camera 2 - front -->
@@ -20,12 +16,8 @@
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
         <param name="prefix_camera_tf" type="str" value="/camera2" />
-        <param name="num_cameras" type="int" value="2" /> 
         <param name="publish_cameras_tf" value="false" />
         <param name="publish_odom_tf" value="true" />
-        <param name="offset_x_degree" value="90.0" />
-        <param name="offset_y_degree" value="0.0" />
-        <param name="offset_z_degree" value="0.0" />
         <param name="camera_orientation" value="front" />
     </node>
     <!-- Camera 3 - bottom -->
@@ -34,12 +26,8 @@
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
         <param name="prefix_camera_tf" type="str" value="/camera3" />
-        <param name="num_cameras" type="int" value="2" /> 
         <param name="publish_cameras_tf" value="false" />
         <param name="publish_odom_tf" value="true" />
-        <param name="offset_x_degree" value="0.0" />
-        <param name="offset_y_degree" value="180.0" />
-        <param name="offset_z_degree" value="180.0" />
         <param name="camera_orientation" value="bottom" />
     </node>
 </launch>
