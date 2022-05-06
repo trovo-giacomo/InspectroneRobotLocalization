@@ -1,7 +1,4 @@
 <launch>
-    <arg name="camera1_differential" default="false" />
-    <arg name="camera2_differential" default="false" />
-    <arg name="camera3_differential" default="false" />
     <!-- Visualize and publish IMU camera extrinsic for each stereo camera  -->
     <!-- Camera 1 - top -->
     <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera1" output="screen">
@@ -9,17 +6,9 @@
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
         <param name="prefix_camera_tf" type="str" value="/camera1" />
-        <param name="num_cameras" type="int" value="2" /> 
         <param name="publish_cameras_tf" value="false" />
         <param name="publish_odom_tf" value="true" />
-        <!-- <param name="offset_x_degree" value="0.0" />
-        <param name="offset_y_degree" value="0.0" />
-        <param name="offset_z_degree" value="90.0" /> -->
-        <param name="offset_x_degree" value="0.0" />
-        <param name="offset_y_degree" value="0.0" />
-        <param name="offset_z_degree" value="0.0" />
         <param name="camera_orientation" value="top" />
-        <param name="differential" type="bool" value="$(arg camera1_differential)" />
     </node>
     <!-- Camera 2 - front -->
     <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera2" output="screen">
@@ -27,17 +16,9 @@
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
         <param name="prefix_camera_tf" type="str" value="/camera2" />
-        <param name="num_cameras" type="int" value="2" /> 
         <param name="publish_cameras_tf" value="false" />
         <param name="publish_odom_tf" value="true" />
-        <!-- <param name="offset_x_degree" value="90.0" />
-        <param name="offset_y_degree" value="0.0" />
-        <param name="offset_z_degree" value="90.0" /> -->
-        <param name="offset_x_degree" value="90.0" />
-        <param name="offset_y_degree" value="0.0" />
-        <param name="offset_z_degree" value="0.0" />
         <param name="camera_orientation" value="front" />
-        <param name="differential" type="bool" value="$(arg camera2_differential)" />
     </node>
     <!-- Camera 3 - bottom -->
     <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera3" output="screen">
@@ -45,16 +26,8 @@
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
         <param name="prefix_camera_tf" type="str" value="/camera3" />
-        <param name="num_cameras" type="int" value="2" /> 
         <param name="publish_cameras_tf" value="false" />
         <param name="publish_odom_tf" value="true" />
-        <!-- <param name="offset_x_degree" value="180.0" />
-        <param name="offset_y_degree" value="0.0" />
-        <param name="offset_z_degree" value="90.0" /> -->
-        <param name="offset_x_degree" value="0.0" />
-        <param name="offset_y_degree" value="180.0" />
-        <param name="offset_z_degree" value="180.0" />
         <param name="camera_orientation" value="bottom" />
-        <param name="differential" type="bool" value="$(arg camera3_differential)" />
     </node>
 </launch>

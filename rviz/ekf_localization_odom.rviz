@@ -199,19 +199,81 @@ Visualization Manager:
       Unreliable: false
       Value: true
     - Class: rviz/TF
-      Enabled: false
+      Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        base_link:
+          Value: false
+        base_link_1:
+          Value: false
+        base_link_2:
+          Value: false
+        base_link_3:
+          Value: false
+        camera1_frame:
+          Value: false
+        camera1_odom_frame:
+          Value: false
+        camera1_optical:
+          Value: false
+        camera1_pose_frame:
+          Value: false
+        camera2_frame:
+          Value: false
+        camera2_odom_frame:
+          Value: false
+        camera2_optical:
+          Value: false
+        camera2_pose_frame:
+          Value: false
+        camera3_frame:
+          Value: false
+        camera3_odom_frame:
+          Value: false
+        camera3_optical:
+          Value: false
+        camera3_pose_frame:
+          Value: false
+        imu:
+          Value: false
+        odom:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        odom:
+          base_link:
+            imu:
+              camera1_frame:
+                {}
+              camera2_frame:
+                {}
+              camera3_frame:
+                {}
+          camera1_odom_frame:
+            camera1_pose_frame:
+              base_link_1:
+                {}
+          camera1_optical:
+            {}
+          camera2_odom_frame:
+            camera2_pose_frame:
+              base_link_2:
+                {}
+          camera2_optical:
+            {}
+          camera3_odom_frame:
+            camera3_pose_frame:
+              base_link_3:
+                {}
+          camera3_optical:
+            {}
       Update Interval: 0
-      Value: false
+      Value: true
     - Angle Tolerance: 0.10000000149011612
       Class: rviz/Odometry
       Covariance:
@@ -274,7 +336,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 5.790025234222412
+      Distance: 6.014861106872559
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -289,10 +351,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5853965878486633
+      Pitch: 0.48539644479751587
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.843542575836182
+      Yaw: 4.798550128936768
     Saved: ~
 Window Geometry:
   Displays:

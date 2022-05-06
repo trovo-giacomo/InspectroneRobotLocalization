@@ -15,7 +15,6 @@ ros::Subscriber odom_sub;
 string camera; // = "camera2";
 string base_link; // = "base_link_2";
 string prefix_odom; // = "cam2";
-bool isDifferential;
 tf::StampedTransform t_odom_cameraOdom, t_cameraPose_bl;
 
 
@@ -23,23 +22,14 @@ tf::StampedTransform t_odom_cameraOdom, t_cameraPose_bl;
 void transformPose(geometry_msgs::PoseWithCovariance p_camOdo_pose, geometry_msgs::PoseWithCovariance& p_odom_bl){
     geometry_msgs::PoseWithCovariance p_odom_camPose;
     float kCovaraince;
-    if(!isDifferential){
-        // Transform the odometry from odom to base_link
-        // compose transformation odom <-> camera_odom_frame (+) camera_odom_frame <-> camera_pose_frame  = odom <-> camera_pose_frame
-        pose_cov_ops::compose(p_odom_camOdo, p_camOdo_pose,  p_odom_camPose);
-        // compose transformation odom <-> camera_pose_frame (+) camera_pose_frame <-> base_link = odom <-> base_link
-        pose_cov_ops::compose(p_odom_camPose, p_camPose_bl, p_odom_bl);
-        kCovaraince = 10; //inflate covariance constant
-    }
-    else{
-        // compose transformation camera_odom_frame <-> camera_pose_frame (+) camera_pose_frame <-> base_link = camera_odom_frame <-> base_link
-        //pose_cov_ops::compose(p_camOdo_pose, p_camPose_bl, p_odom_bl);
-        pose_cov_ops::compose(p_odom_camOdo, p_camOdo_pose,  p_odom_camPose);
-        // compose transformation odom <-> camera_pose_frame (+) camera_pose_frame <-> base_link = odom <-> base_link
-        pose_cov_ops::compose(p_odom_camPose, p_camPose_bl, p_odom_bl);
-        kCovaraince = 1; //inflate covariance constant - No need for now to inflate it
-    }
+    
+    // Transform the odometry from odom to base_link
+    // compose transformation odom <-> camera_odom_frame (+) camera_odom_frame <-> camera_pose_frame  = odom <-> camera_pose_frame
+    pose_cov_ops::compose(p_odom_camOdo, p_camOdo_pose,  p_odom_camPose);
+    // compose transformation odom <-> camera_pose_frame (+) camera_pose_frame <-> base_link = odom <-> base_link
+    pose_cov_ops::compose(p_odom_camPose, p_camPose_bl, p_odom_bl);
 
+    kCovaraince = 10; //inflate covariance constant
     //inflate covariance of orientation
     p_odom_bl.covariance[21] = p_odom_bl.covariance[21] * kCovaraince;
     //p_odom_bl.covariance[22] = p_odom_bl.covariance[22] * kCovaraince;
@@ -71,9 +61,6 @@ void transformTwist(geometry_msgs::TwistWithCovariance msg_twist, geometry_msgs:
     // apply rotation to the linear velocities
     new_linear_vel = rot_camPose_bl * linear_vel + trans_camPose_bl * rot_camPose_bl * angular_vel;
     new_angular_vel = rot_camPose_bl * angular_vel;
-    //cout << "linear vel" << " " <<  linear_vel.getX() << " " <<  linear_vel.getY() << " " <<  linear_vel.getZ() << endl;
-    //cout << "rot matrix" << rot_camPose_bl.str() << endl;
-    //cout << "result vel" << " "<< new_linear_vel.getX() << " "<< new_linear_vel.getY() << " "<< new_linear_vel.getZ() << endl;
     
     // write back the values to the geometry message - TwistWithCovariance
     new_twist.twist.linear.x = new_linear_vel.getX();
@@ -88,12 +75,6 @@ void transformTwist(geometry_msgs::TwistWithCovariance msg_twist, geometry_msgs:
 
     /* Do not rotate the covariance as it is a diagonal matrix */
     new_twist.covariance = msg_twist.covariance;
-    
-    // Visualization of the covariance
-    /*cout << "covariance matrix" << endl;
-    cout << newCovariance_linear_vel[0][0] << " " << newCovariance_linear_vel[0][1] << " " << newCovariance_linear_vel[0][2] << endl;
-    cout << newCovariance_linear_vel[1][0] << " " << newCovariance_linear_vel[1][1] << " " << newCovariance_linear_vel[1][2] << endl;
-    cout << newCovariance_linear_vel[2][0] << " " << newCovariance_linear_vel[2][1] << " " << newCovariance_linear_vel[2][2] << endl;*/
 }
 
 
@@ -128,15 +109,8 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     //string child_frame = camera + "_frame";
     string child_frame = "base_link";
     string new_frame_id;
-    if(isDifferential){
-        // as I haven't transform from odom to camera_odom_frame this need to be done by robot_loclaization so the frame_id of the odometry message is:
-        //new_frame_id =  camera + "_odom_frame";
-        new_frame_id =  "odom";
-    }
-    else{
-        // everything is transformed to be in the odom frame so the frame_id of the odometry message is:
-        new_frame_id =  "odom";
-    }
+    // everything is transformed to be in the odom frame so the frame_id of the odometry message is:
+    new_frame_id =  "odom";
     //string new_frame_id =  camera + "_odom_frame";
     nav_msgs::Odometry transformed_odom = *msg;
     transformed_odom.pose = p_odom_bl; // fill in the pose with covariance the transfromed pose
@@ -153,23 +127,6 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
 
 
 int main(int argc, char **argv) {
-    // if(argc != 7){
-    //     //cout << "The node need to be called with 4 arguments" << endl;
-    //     //cout << "Called with " << argc << " parameters" << endl;
-    //     //for(int i=0; i<argc; i++){
-    //     //   cout << "param" << i <<": " << argv[i] << endl;
-    //     //}//for
-    //     cout << "Not enough arguments" << endl;
-    //     return -1;
-    // }
-    // else{
-    //     camera = argv[1]; // prefix of the camera topic for realsense t265
-    //     base_link = argv[2]; //base_link frame name relative to the camera#_pose_frame
-    //     prefix_odom = argv[3]; //new topic prefix name for the new odometry
-    //     node_name = argv[4]; //name of the node
-    //     cout << camera << " " << base_link << " " << prefix_odom << " " << node_name << endl;
-    // }
-
     // init node
     ros::init(argc, argv, "republish_transformed_odom");
     ros::NodeHandle n("~");
@@ -179,9 +136,8 @@ int main(int argc, char **argv) {
     n.param("camera", camera, string("camera")); // prefix of the camera topic for realsense t265
 	n.param("base_link", base_link, string("base_link")); // base_link frame name relative to the camera#_pose_frame
     n.param("prefix_odom", prefix_odom, string("cam")); // new topic prefix name for the new odometry
-	n.param("differential", isDifferential, bool(false)); // Does the odometry message need to be use as differential in robot_localization
 
-    cout << camera << " " << base_link << " " << prefix_odom << " " << isDifferential << endl;
+    //cout << camera << " " << base_link << " " << prefix_odom << " " << endl;
 
     string topic_pub = "/"+prefix_odom + "/odom/sample_throttled";
     string topic_sub = "/"+camera+"/odom/sample_throttled";
@@ -233,7 +189,6 @@ int main(int argc, char **argv) {
         p_camPose_bl.orientation.y = t_cameraPose_bl.getRotation().y();
         p_camPose_bl.orientation.z = t_cameraPose_bl.getRotation().z();
         p_camPose_bl.orientation.w = t_cameraPose_bl.getRotation().w();
-        //cout << "p_camPose_bl orientation: " << p_camPose_bl.orientation.x << " " <<p_camPose_bl.orientation.y << " " << p_camPose_bl.orientation.z << " " << p_camPose_bl.orientation.z << endl;
 
 
     }
