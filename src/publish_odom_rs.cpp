@@ -70,10 +70,52 @@ void transformTwist(geometry_msgs::TwistWithCovariance msg_twist, geometry_msgs:
     new_twist.twist.angular.y = new_angular_vel.getY();
     new_twist.twist.angular.z = new_angular_vel.getZ();
 
-    // rotate the covariance matrix
-    tf::Matrix3x3 matCov_linear_vel, newCovariance_linear_vel;
+    
 
-    /* Do not rotate the covariance as it is a diagonal matrix */
+    /* Rotate twist coaviance: C_new = R * C * R^T */
+    tf::Matrix3x3 matCov_linear_vel, newCovariance_linear_vel;
+    tf::Matrix3x3 matCov_angular_vel, newCovariance_angular_vel;
+
+    // msg_twist.covariance is a 36 dimension vector every 6 position starts a new row of the matrix - get covariance only of linear velocity
+    matCov_linear_vel.setValue( msg_twist.covariance[0], msg_twist.covariance[1], msg_twist.covariance[2],
+                                msg_twist.covariance[6], msg_twist.covariance[7], msg_twist.covariance[8],
+                                msg_twist.covariance[12], msg_twist.covariance[13], msg_twist.covariance[14]);
+    // apply transformation C_new = Rot * Cov * Rot^T 
+    newCovariance_linear_vel = rot_camPose_bl * matCov_linear_vel * rot_camPose_bl.transpose();
+
+    // msg_twist.covariance is a 36 dimension vector every 6 position starts a new row of the matrix - get covariance only of angular velocity
+    matCov_angular_vel.setValue( msg_twist.covariance[21], msg_twist.covariance[22], msg_twist.covariance[23],
+                                msg_twist.covariance[27], msg_twist.covariance[28], msg_twist.covariance[29],
+                                msg_twist.covariance[33], msg_twist.covariance[34], msg_twist.covariance[35]);
+    // apply transformation C_new = Rot * Cov * Rot^T 
+    newCovariance_angular_vel = rot_camPose_bl * matCov_angular_vel * rot_camPose_bl.transpose();
+    // write back the new covariance into the geometry message - linear velocity
+    new_twist.covariance[0] = newCovariance_linear_vel[0][0];
+    new_twist.covariance[1] = newCovariance_linear_vel[0][1];
+    new_twist.covariance[2] = newCovariance_linear_vel[0][2];
+    new_twist.covariance[6] = newCovariance_linear_vel[1][0];
+    new_twist.covariance[7] = newCovariance_linear_vel[1][1];
+    new_twist.covariance[8] = newCovariance_linear_vel[1][2];
+    new_twist.covariance[12] = newCovariance_linear_vel[2][0];
+    new_twist.covariance[13] = newCovariance_linear_vel[2][1];
+    new_twist.covariance[14] = newCovariance_linear_vel[2][2];
+    // write back the new covariance into the geometry message - angular velocity
+    new_twist.covariance[21] = newCovariance_angular_vel[0][0];
+    new_twist.covariance[22] = newCovariance_angular_vel[0][1];
+    new_twist.covariance[23] = newCovariance_angular_vel[0][2];
+    new_twist.covariance[27] = newCovariance_angular_vel[1][0];
+    new_twist.covariance[28] = newCovariance_angular_vel[1][1];
+    new_twist.covariance[29] = newCovariance_angular_vel[1][2];
+    new_twist.covariance[33] = newCovariance_angular_vel[2][0];
+    new_twist.covariance[34] = newCovariance_angular_vel[2][1];
+    new_twist.covariance[35] = newCovariance_angular_vel[2][2];
+
+    // Visualization of the covariance
+    /*cout << "covariance matrix" << endl;
+    cout << newCovariance_linear_vel[0][0] << " " << newCovariance_linear_vel[0][1] << " " << newCovariance_linear_vel[0][2] << endl;
+    cout << newCovariance_linear_vel[1][0] << " " << newCovariance_linear_vel[1][1] << " " << newCovariance_linear_vel[1][2] << endl;
+    cout << newCovariance_linear_vel[2][0] << " " << newCovariance_linear_vel[2][1] << " " << newCovariance_linear_vel[2][2] << endl;*/
+
     new_twist.covariance = msg_twist.covariance;
 }
 
