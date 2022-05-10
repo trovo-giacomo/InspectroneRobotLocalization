@@ -220,3 +220,6 @@ target_link_libraries(publish_odom_rs_test_diff ${catkin_LIBRARIES})
 add_executable(transform_rl_odometry src/transform_rl_odometry.cpp)
 target_link_libraries(transform_rl_odometry ${catkin_LIBRARIES})
 
+add_executable(test_rotations_cov src/test_rotations_cov.cpp)
+target_link_libraries(test_rotations_cov ${catkin_LIBRARIES})
+
