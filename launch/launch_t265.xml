@@ -15,11 +15,11 @@
         /camera3/tracking_module/frames_queue_size: 2
     </rosparam>
     <rosparam>
-        /camera1/tracking_module/enable_pose_jumping: true
+        /camera1/tracking_module/enable_pose_jumping: false
         /camera1/tracking_module/enable_relocalization: false
-        /camera2/tracking_module/enable_pose_jumping: true
+        /camera2/tracking_module/enable_pose_jumping: false
         /camera2/tracking_module/enable_relocalization: false
-        /camera3/tracking_module/enable_pose_jumping: true
+        /camera3/tracking_module/enable_pose_jumping: false
         /camera3/tracking_module/enable_relocalization: false
     </rosparam>
     

@@ -3,7 +3,7 @@
     <arg name="input_bag_name" default="cameras_manual_flight_4.bag" />
     
     <param name="use_sim_time" value="true" />
-    <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/localization/$(arg input_bag_name) --clock"/>
+    <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/localization/waypoint_motion_capture/$(arg input_bag_name) --clock"/>
     <!-- Include file for launching the t265 cameras -->
     <!--<include file="$(find InspectroneRobotLocalization)/launch/launch_t265.xml">-->
    
@@ -40,5 +40,5 @@
     </node>
 
     <!-- RVIZ visulization -->
-    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find InspectroneRobotLocalization)/rviz/ekf_localization_odom.rviz"/>
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find InspectroneRobotLocalization)/rviz/ekf_localization_odom_with_motion_capture.rviz"/>
 </launch>

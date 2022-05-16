@@ -23,12 +23,30 @@ void transformPose(geometry_msgs::PoseWithCovariance p_camOdo_pose, geometry_msg
     geometry_msgs::PoseWithCovariance p_odom_camPose;
     float kCovaraince;
     
+    tf::Quaternion q_t265 = tf::Quaternion(p_camOdo_pose.pose.orientation.x,p_camOdo_pose.pose.orientation.y,p_camOdo_pose.pose.orientation.z,p_camOdo_pose.pose.orientation.w);
+    q_t265 = q_t265.normalize();
+    p_camOdo_pose.pose.orientation.x = q_t265.x();
+    p_camOdo_pose.pose.orientation.y = q_t265.y();
+    p_camOdo_pose.pose.orientation.z = q_t265.z();
+    p_camOdo_pose.pose.orientation.w = q_t265.w();
     // Transform the odometry from odom to base_link
     // compose transformation odom <-> camera_odom_frame (+) camera_odom_frame <-> camera_pose_frame  = odom <-> camera_pose_frame
     pose_cov_ops::compose(p_odom_camOdo, p_camOdo_pose,  p_odom_camPose);
+    tf::Quaternion q_temp = tf::Quaternion(p_odom_camPose.pose.orientation.x,p_odom_camPose.pose.orientation.y,p_odom_camPose.pose.orientation.z,p_odom_camPose.pose.orientation.w);
+    q_temp = q_temp.normalize();
+    p_odom_camPose.pose.orientation.x = q_temp.x();
+    p_odom_camPose.pose.orientation.y = q_temp.y();
+    p_odom_camPose.pose.orientation.z = q_temp.z();
+    p_odom_camPose.pose.orientation.w = q_temp.w();
     // compose transformation odom <-> camera_pose_frame (+) camera_pose_frame <-> base_link = odom <-> base_link
     pose_cov_ops::compose(p_odom_camPose, p_camPose_bl, p_odom_bl);
 
+    tf::Quaternion q = tf::Quaternion(p_odom_bl.pose.orientation.x,p_odom_bl.pose.orientation.y,p_odom_bl.pose.orientation.z,p_odom_bl.pose.orientation.w);
+    q = q.normalize();
+    p_odom_bl.pose.orientation.x = q.x();
+    p_odom_bl.pose.orientation.y = q.y();
+    p_odom_bl.pose.orientation.z = q.z();
+    p_odom_bl.pose.orientation.w = q.w();
     kCovaraince = 10; //inflate covariance constant
     //inflate covariance of orientation
     p_odom_bl.covariance[21] = p_odom_bl.covariance[21] * kCovaraince;
@@ -204,11 +222,11 @@ int main(int argc, char **argv) {
         p_odom_camOdo.position.z = t_odom_cameraOdom.getOrigin().z();
         
 
-        float s = t_cameraPose_bl.getRotation().getW();
-        p_odom_camOdo.orientation.x = t_odom_cameraOdom.getRotation().x();
-        p_odom_camOdo.orientation.y = t_odom_cameraOdom.getRotation().y();
-        p_odom_camOdo.orientation.z = t_odom_cameraOdom.getRotation().z();
-        p_odom_camOdo.orientation.w = t_odom_cameraOdom.getRotation().w();
+        tf::Quaternion q_t_odom_cameraOdom = t_odom_cameraOdom.getRotation().normalize();
+        p_odom_camOdo.orientation.x = q_t_odom_cameraOdom.x();
+        p_odom_camOdo.orientation.y = q_t_odom_cameraOdom.y();
+        p_odom_camOdo.orientation.z = q_t_odom_cameraOdom.z();
+        p_odom_camOdo.orientation.w = q_t_odom_cameraOdom.w();
 
         //cout << "p_odo_camOdo orientation: " << p_odom_camOdo.orientation.x << " " <<p_odom_camOdo.orientation.y << " " << p_odom_camOdo.orientation.z << " " << p_odom_camOdo.orientation.w << endl;
     }
@@ -226,11 +244,11 @@ int main(int argc, char **argv) {
         p_camPose_bl.position.y = t_cameraPose_bl.getOrigin().y();
         p_camPose_bl.position.z = t_cameraPose_bl.getOrigin().z();
         
-        float s = t_cameraPose_bl.getRotation().getW();
-        p_camPose_bl.orientation.x = t_cameraPose_bl.getRotation().x();
-        p_camPose_bl.orientation.y = t_cameraPose_bl.getRotation().y();
-        p_camPose_bl.orientation.z = t_cameraPose_bl.getRotation().z();
-        p_camPose_bl.orientation.w = t_cameraPose_bl.getRotation().w();
+        tf::Quaternion q_t_cameraPose_bl = t_cameraPose_bl.getRotation().normalize();
+        p_camPose_bl.orientation.x = q_t_cameraPose_bl.x();
+        p_camPose_bl.orientation.y = q_t_cameraPose_bl.y();
+        p_camPose_bl.orientation.z = q_t_cameraPose_bl.z();
+        p_camPose_bl.orientation.w = q_t_cameraPose_bl.w();
 
 
     }
@@ -240,8 +258,8 @@ int main(int argc, char **argv) {
     }
     // ============== Subscribe and advertise topic: ==========================================
     cout << "3. Now subscribe to topic and publish new one" << endl;
-    odom_pub  = n.advertise<nav_msgs::Odometry>(topic_pub.c_str(), 1000);
-    odom_sub = n.subscribe(topic_sub.c_str(), 1000, handle_odometry_rs);
+    odom_pub  = n.advertise<nav_msgs::Odometry>(topic_pub.c_str(), 100);
+    odom_sub = n.subscribe(topic_sub.c_str(), 100, handle_odometry_rs);
 
     ros::spin();
     return 0;
