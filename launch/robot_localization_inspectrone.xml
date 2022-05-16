@@ -64,7 +64,7 @@
         <param name="debug"           value="true"/>
         <param name="debug_out_file"  value="debug_ekf_localization.txt"/>
         <!-- If set to true will not run the filter on start. -->
-        <!--<param name="disabled_at_startup" value="true" />-->
+        <param name="disabled_at_startup" value="true" />
         
         <!-- If true, will dynamically scale the process_noise_covariance based on the robot’s velocity. This is useful, e.g., when you want your robot’s estimate error covariance to stop growing when the robot is stationary.-->
         <param name="dynamic_process_noise_covariance" value="true" />

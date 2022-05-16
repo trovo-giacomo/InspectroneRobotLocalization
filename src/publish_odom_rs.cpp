@@ -4,6 +4,7 @@
 #include "geometry_msgs/Pose.h"
 //#include "geometry_msgs/TwistStamped.h"
 #include "geometry_msgs/TwistWithCovariance.h"
+#include "std_srvs/Empty.h"
 #include "pose_cov_ops/pose_cov_ops.h"
 #include "tf/transform_listener.h"
 
@@ -17,6 +18,8 @@ string base_link; // = "base_link_2";
 string prefix_odom; // = "cam2";
 tf::StampedTransform t_odom_cameraOdom, t_cameraPose_bl;
 geometry_msgs::PoseWithCovariance prevPose;
+bool firstOdomMsg = true;
+int state = 0;
 
 
 int transformPose(geometry_msgs::PoseWithCovariance p_camOdo_pose, geometry_msgs::PoseWithCovariance& p_odom_bl){
@@ -156,6 +159,7 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     geometry_msgs::PoseWithCovariance p_camOdo_pose, p_odom_bl;
     geometry_msgs::TwistWithCovariance msg_twist, new_twist, new_twist_cov;
 
+
     // get the position with covariance between camera_odom_frame and camera_pose_frame
     p_camOdo_pose = msg->pose;
     
@@ -202,6 +206,12 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     //cout << ".5 Now publish the converted message" << endl;
     // publish new odometry value
     odom_pub.publish(transformed_odom);
+
+    // Enable Robot Localization when at least one camera is on
+    if(firstOdomMsg){
+        firstOdomMsg = false;
+        state = 1;
+    }
 
 }//handle_odometry_rs
 
@@ -284,6 +294,18 @@ int main(int argc, char **argv) {
     odom_pub  = n.advertise<nav_msgs::Odometry>(topic_pub.c_str(), 100);
     odom_sub = n.subscribe(topic_sub.c_str(), 100, handle_odometry_rs);
 
+    ros::Rate r(20); // 20 hz
+    while (state == 0){ // still haven't received one odom message yet
+        ros::spinOnce();
+        r.sleep();
+    }
+
+    // now I am sure that at least one camera is up - enable robot_localization
+    //call service /ekf_odom/enable
+    ros::service::waitForService("/ekf_odom/enable");
+    ros::ServiceClient startRL = n.serviceClient<std_srvs::Empty>("/ekf_odom/enable");
+    std_srvs::Empty srv;
+    startRL.call(srv);
     ros::spin();
     return 0;
 
