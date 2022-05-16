@@ -16,12 +16,12 @@ string camera; // = "camera2";
 string base_link; // = "base_link_2";
 string prefix_odom; // = "cam2";
 tf::StampedTransform t_odom_cameraOdom, t_cameraPose_bl;
+geometry_msgs::PoseWithCovariance prevPose;
 
 
-
-void transformPose(geometry_msgs::PoseWithCovariance p_camOdo_pose, geometry_msgs::PoseWithCovariance& p_odom_bl){
+int transformPose(geometry_msgs::PoseWithCovariance p_camOdo_pose, geometry_msgs::PoseWithCovariance& p_odom_bl){
     geometry_msgs::PoseWithCovariance p_odom_camPose;
-    float kCovaraince;
+    float kCovaraince, jump_threshold = 0.5;
     
     tf::Quaternion q_t265 = tf::Quaternion(p_camOdo_pose.pose.orientation.x,p_camOdo_pose.pose.orientation.y,p_camOdo_pose.pose.orientation.z,p_camOdo_pose.pose.orientation.w);
     q_t265 = q_t265.normalize();
@@ -58,6 +58,19 @@ void transformPose(geometry_msgs::PoseWithCovariance p_camOdo_pose, geometry_msg
     //p_odom_bl.covariance[33] = p_odom_bl.covariance[33] * kCovaraince;
     //p_odom_bl.covariance[34] = p_odom_bl.covariance[34] * kCovaraince;
     p_odom_bl.covariance[35] = p_odom_bl.covariance[35] * kCovaraince;
+
+    // check if previous messasge has more or less the same orientation of the current one - if not discard message
+    if(abs(prevPose.pose.orientation.w - p_odom_bl.pose.orientation.w) > jump_threshold){
+        //cout << "diff: " <<abs(prevPose.pose.orientation.w - p_odom_bl.pose.orientation.w) << endl;
+        //cout << "prev pose: " << prevPose.pose.orientation.x << ", " << prevPose.pose.orientation.y << ", " << prevPose.pose.orientation.z << ", " << prevPose.pose.orientation.w << endl;
+        //cout << "curr pose: " << p_odom_bl.pose.orientation.x << ", " << p_odom_bl.pose.orientation.y << ", " << p_odom_bl.pose.orientation.z << ", " << p_odom_bl.pose.orientation.w << endl;
+        return -1;
+    }
+    else{
+        prevPose = p_odom_bl;
+        return 0;
+    }
+
 
 }//transformPose
 
@@ -147,7 +160,14 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
     p_camOdo_pose = msg->pose;
     
     // Transform Pose from camera_odom <-> camera_pose to odom <-> base_link
-    transformPose(p_camOdo_pose, p_odom_bl);
+    int resultTransformPose = transformPose(p_camOdo_pose, p_odom_bl);
+    // the transformed pose has a completelly different orientation wrt to the previous one -> discard message
+    // TODO investigate if this can be a numerical error when transforming the pose (the original message does not have this problem)
+    if(resultTransformPose < 0){
+        ROS_WARN("Jump pose detected");
+        cout << "Jump pose detected at time " << msg->header.stamp << endl;     
+        return;   
+    }
     if(isnan(p_odom_bl.pose.position.x) || isnan(p_odom_bl.pose.position.y) || isnan(p_odom_bl.pose.position.z) || isnan(p_odom_bl.pose.orientation.x) || isnan(p_odom_bl.pose.orientation.y) || isnan(p_odom_bl.pose.orientation.z) || isnan(p_odom_bl.pose.orientation.w) ){
         // at least one element in the transformation is nan - dropping transform
         cout << "Nan values in the transformation of the pose in " << camera << endl;        
@@ -190,6 +210,9 @@ int main(int argc, char **argv) {
     // init node
     ros::init(argc, argv, "republish_transformed_odom");
     ros::NodeHandle n("~");
+    // init prev prose with covariance - used to filter out messages with wrong orientation wrt to the previous one
+    prevPose = geometry_msgs::PoseWithCovariance();
+    prevPose.pose.orientation.w = 1.0;
     
     string topic_pub_, topic_sub_;
     // ============== Get Input parameters: ==========================================
