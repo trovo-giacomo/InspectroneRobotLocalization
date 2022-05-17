@@ -212,10 +212,6 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
         firstOdomMsg = false;
         state = 1;
     }
-    else if (state == 1){
-        // second odometry message received
-        state = state++;
-    }
 
 }//handle_odometry_rs
 
@@ -299,7 +295,7 @@ int main(int argc, char **argv) {
     odom_sub = n.subscribe(topic_sub.c_str(), 100, handle_odometry_rs);
 
     ros::Rate r(20); // 20 hz
-    while (state < 2){ // still haven't received one odom message yet
+    while (state < 1){ // still haven't received one odom message yet
         ros::spinOnce();
         r.sleep();
     }
