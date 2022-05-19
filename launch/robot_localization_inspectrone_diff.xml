@@ -1,3 +1,4 @@
+<!-- EKF configured to take cameras odometry pose, orientation and velocity - differential -->
 <launch>
     <arg name="node_start_delay"         default="10.0"/>
     <node name="ekf_odom" pkg="robot_localization" type="ekf_localization_node" clear_params="true" required="true"  launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
