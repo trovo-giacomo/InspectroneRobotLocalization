@@ -34,6 +34,7 @@
         <param name="odom1_differential" value="false" />
         <param name="odom1_relative" value="false" />
         <param name="odom1_queue_size" value="50" />
+        <param name="odom1_pose_rejection_threshold" value="5" />
         <!-- <param name="odom1_twist_rejection_threshold" value="50" /> -->
 
         <param name="odom2" value="/cam3/odom/sample_throttled" />
@@ -46,6 +47,7 @@
         <param name="odom2_differential" value="true" />
         <param name="odom2_relative" value="false" />
         <param name="odom2_queue_size" value="50" />
+        <param name="odom2_pose_rejection_threshold" value="5" />
         <!-- <param name="odom2_twist_rejection_threshold" value="50" /> -->
 
 
@@ -86,25 +88,9 @@
         <param name="dynamic_process_noise_covariance" value="true" />
 
         <!-- The process noise covariance, commonly denoted Q, is used to model uncertainty in the prediction stage of the filtering algorithms. In general, the larger the value for Q relative to the variance for a given variable in an input message, the faster the filter will converge to the value in the measurement.-->
-            <!-- EKF param - trials -->
-            <!-- with differential cam1 & cam3 diff cam2 not diff-->
-            <rosparam param="process_noise_covariance">[1e-3, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    1e-3, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    1e-3, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    1e-3 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    1e-3, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    0,    1e-2, 0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    0,    0,    1e-2,  0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    0,    0,    0,     1e-2,  0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    0,    0,    0,     0,     1e-2, 0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-3, 0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-3, 0,    0,    0,    0,
-                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-3, 0,    0,    0,
-                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-3, 0,    0,
-                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-3, 0,
-                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-3]</rosparam>
+            <!-- EKF param -->
             <!-- All cameras differentials -->
-            <!-- <rosparam param="process_noise_covariance">[1e-4, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+            <rosparam param="process_noise_covariance">[1e-4, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    1e-4, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    0,    1e-4, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    0,    0,    1e-4 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
@@ -118,7 +104,7 @@
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-3, 0,    0,    0,
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-3, 0,    0,
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-3, 0,
-                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-3]</rosparam> -->
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-3]</rosparam>
         <!-- Initial state -->
         <rosparam param="initial_state">[0.0,  0.0,  0.0,
                                          0.0,  0.0,  0.0,
