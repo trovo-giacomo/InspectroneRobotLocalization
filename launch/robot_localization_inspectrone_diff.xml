@@ -23,7 +23,6 @@
         <param name="odom0_differential" value="true" />
         <param name="odom0_relative" value="false" />
         <param name="odom0_queue_size" value="50" />
-        <param name="odom0_twist_rejection_threshold" value="5" />
 
         <param name="odom1" value="/cam2/odom/sample_throttled" />
         <rosparam param="odom1_config">[true, true, true,
@@ -34,8 +33,6 @@
         <param name="odom1_differential" value="true" />
         <param name="odom1_relative" value="false" />
         <param name="odom1_queue_size" value="50" />
-        <param name="odom1_pose_rejection_threshold" value="5" />
-        <!-- <param name="odom1_twist_rejection_threshold" value="50" /> -->
 
         <param name="odom2" value="/cam3/odom/sample_throttled" />
         <rosparam param="odom2_config">[true, true, true,
@@ -46,9 +43,16 @@
         <param name="odom2_differential" value="true" />
         <param name="odom2_relative" value="false" />
         <param name="odom2_queue_size" value="50" />
-        <param name="odom2_pose_rejection_threshold" value="5" />
-        <!-- <param name="odom2_twist_rejection_threshold" value="50" /> -->
 
+        <!-- rejection threshold for pose and twist: to improve the estimate of the fusion -->
+        
+        <!-- Good values:  -->
+        <param name="odom0_pose_rejection_threshold" value="5" />
+        <param name="odom1_pose_rejection_threshold" value="5" />
+        <param name="odom2_pose_rejection_threshold" value="5" />
+        <!-- <param name="odom0_twist_rejection_threshold" value="50" />
+        <param name="odom1_twist_rejection_threshold" value="50" />
+        <param name="odom2_twist_rejection_threshold" value="50" /> -->
 
         <param name="imu0"  value="/mavros/imu/data" />
         <rosparam param="imu0_config">[false, false, false,
@@ -60,8 +64,7 @@
         <param name="imu0_relative" value="false" />
         <param name="imu0_queue_size" value="50" />
         <param name="imu0_remove_gravitational_acceleration"  value="true"/>
-        <!-- <param name="imu0_twist_rejection_threshold" value="0.1" /> -->
-        <!-- <param name="imu0_pose_rejection_threshold" value="0.5" /> -->
+
 
         <param name="imu1"  value="/mavros/imu/data" />
         <rosparam param="imu1_config">[false, false, false,
@@ -110,6 +113,21 @@
                                          0.0,  0.0,  0.0,
                                          0.0,  0.0,  0.0,
                                          0.0,  0.0,  0.0]</rosparam>
+        <rosparam param="initial_estimate_covariance">[1e-2, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    1e-2, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    1e-2, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    1e-3 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    1e-3, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    1e-3, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    1e-4, 0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     1e-4,  0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     1e-4, 0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-4, 0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-4, 0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-4, 0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-4, 0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-4, 0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-4]</rosparam>
     </node>
 
 </launch>

@@ -3,7 +3,7 @@
     <arg name="input_bag_name" default="cameras_manual_flight_4.bag" />
     
     <param name="use_sim_time" value="true" />
-    <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/localization/waypoint_motion_capture/$(arg input_bag_name) --clock"/>
+    <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/localization/$(arg input_bag_name) --clock -s 10"/>
     <!-- Include file for launching the t265 cameras -->
     <!--<include file="$(find InspectroneRobotLocalization)/launch/launch_t265.xml">-->
    
@@ -11,9 +11,22 @@
     <include file="$(find InspectroneRobotLocalization)/launch/publish_cameras_tf_inspectrone.xml" />
     
     <!-- include Robot localization node -->
+    <!-- <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone.xml" /> -->
 
-    <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone.xml" />
-    <!-- <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone.xml" unless="$(arg is_ekf_differential)"/> -->
+    <!-- EKF configured to take cameras odometry only orientation and velocity (not differential) -->
+    <!-- <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone_vel.xml">
+        <arg name="node_start_delay"         value="0.0"/>
+    </include> -->
+    <!-- EKF configured to take cameras odometry in a mixed configuration -->
+    <!-- camera1 and camera3 (top and bottom): pose + orientation + lin velocity with differential -->
+    <!-- camera 2 (front): orientation + lin velocity (not differential) -->
+    <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone_mix.xml">
+        <arg name="node_start_delay"         value="0.0"/>
+    </include>
+    <!-- EKF configured to take cameras odometry pose, orientation and velocity - differential -->
+    <!-- <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone_diff.xml" >
+        <arg name="node_start_delay"         value="0.0"/>
+    </include> -->
 
     <!-- Launch node for preparing data for EKF in robot localization - one for each camera -->
     <!-- args:
