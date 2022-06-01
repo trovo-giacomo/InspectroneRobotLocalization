@@ -2,7 +2,7 @@
     <!-- Visualize and publish IMU camera extrinsic for each stereo camera  -->
     <!-- Camera 1 - top -->
     <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera1" output="screen">
-        <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_camera_calibration_imu_cam1_v3.yaml" />
+        <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_new_camera_calibration_imu_cam1_v1.yaml" />
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
         <param name="prefix_camera_tf" type="str" value="/camera1" />
@@ -12,7 +12,7 @@
     </node>
     <!-- Camera 2 - front -->
     <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera2" output="screen">
-        <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_camera_calibration_imu_cam2_v1.yaml" />
+        <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_new_camera_calibration_imu_cam2_v1.yaml" />
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
         <param name="prefix_camera_tf" type="str" value="/camera2" />
@@ -22,7 +22,7 @@
     </node>
     <!-- Camera 3 - bottom -->
     <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera3" output="screen">
-        <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_camera_calibration_imu_cam3_v1.yaml" />
+        <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_new_camera_calibration_imu_cam3_v1.yaml" />
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
         <param name="prefix_camera_tf" type="str" value="/camera3" />
