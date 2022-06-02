@@ -2,7 +2,7 @@
 <!-- camera1 and camera3 (top and bottom): pose + orientation + lin velocity with differential -->
 <!-- camera 2 (front): orientation + lin velocity (not differential) -->
 <launch>
-    <arg name="node_start_delay"         default="10.0"/>
+    <arg name="node_start_delay"         default="30.0"/>
     <node name="ekf_odom" pkg="robot_localization" type="ekf_localization_node" clear_params="true" required="true"  launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
         <param name="sensor_timeout" value="1"/>
         <!--param name="map_frame" value="map" /-->
