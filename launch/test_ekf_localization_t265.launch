@@ -1,9 +1,12 @@
 <launch>
     <!-- Launch a bag with the three camera odometry topic or launch the 3 rs t265 cameras -->
     <arg name="input_bag_name" default="cameras_manual_flight_4.bag" />
+    <arg name="folder" default="localization/test_inside_tank/ground_truth" />
+    <arg name="start_at" default="0" />
+    <arg name="bag_rate" default="1" />
     
     <param name="use_sim_time" value="true" />
-    <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/localization/$(arg input_bag_name) --clock -s 10"/>
+    <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/$(arg folder)/$(arg input_bag_name) --clock -s $(arg start_at) -r $(arg bag_rate)"/>
     <!-- Include file for launching the t265 cameras -->
     <!--<include file="$(find InspectroneRobotLocalization)/launch/launch_t265.xml">-->
    
@@ -27,6 +30,8 @@
     <!-- <include file="$(find InspectroneRobotLocalization)/launch/robot_localization_inspectrone_diff.xml" >
         <arg name="node_start_delay"         value="0.0"/>
     </include> -->
+
+    <node name="republish_imu_node" output="screen" pkg="InspectroneRobotLocalization" type="republish_imu.py" required="true" />
 
     <!-- Launch node for preparing data for EKF in robot localization - one for each camera -->
     <!-- args:

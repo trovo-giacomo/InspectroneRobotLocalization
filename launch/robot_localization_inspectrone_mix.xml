@@ -20,7 +20,7 @@
                                         true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        true, true, true,
+                                        false, false, false,
                                         false, false, false]</rosparam>
         <param name="odom0_differential" value="true" />
         <param name="odom0_relative" value="false" />
@@ -42,7 +42,7 @@
                                         true, true, true,
                                         true, true, true,
                                         true, true, true,
-                                        true, true, true,
+                                        false, false, false,
                                         false, false, false]</rosparam>
         <param name="odom2_differential" value="true" />
         <param name="odom2_relative" value="false" />
@@ -59,35 +59,24 @@
         <param name="odom2_twist_rejection_threshold" value="5" />
         <param name="odom0_twist_rejection_threshold" value="5" /> -->
 
-        <!-- <param name="imu0"  value="/mavros/imu/data" />
+        <!-- <param name="imu0"  value="/mavros/imu/data" /> -->
+         <param name="imu0"  value="/imu/data_inflated" />
         <rosparam param="imu0_config">[false, false, false,
                                         false, false, false,
                                         false, false, false,
                                         true, true, true,
-                                        false, false, false]</rosparam>
+                                        true, true, true,]</rosparam>
         <param name="imu0_differential" value="true" />
         <param name="imu0_relative" value="false" />
         <param name="imu0_queue_size" value="50" />
         <param name="imu0_remove_gravitational_acceleration"  value="true"/>
-        <param name="imu0_twist_rejection_threshold" value="5" /> -->
+        <!-- <param name="imu0_twist_rejection_threshold" value="5" /> -->
         <!-- <param name="imu0_pose_rejection_threshold" value="0.5" /> -->
 
-        <!-- <param name="imu1"  value="/mavros/imu/data" />
-        <rosparam param="imu1_config">[false, false, false,
-                                        false, false, false,
-                                        false, false, false,
-                                        false, false, false,
-                                        true, true, true]</rosparam>
-        <param name="imu1_differential" value="false" />
-        <param name="imu1_relative" value="true" />
-        <param name="imu1_queue_size" value="50" />
-        <param name="imu1_remove_gravitational_acceleration"  value="true"/>
-        <param name="imu1_twist_rejection_threshold" value="1" /> -->
-        <!-- <param name="imu1_pose_rejection_threshold" value="0.5" /> -->
-        
+                
         <param name="print_diagnostics" value="false"/>
 
-        <param name="debug"           value="true"/>
+        <param name="debug"           value="false"/>
         <param name="debug_out_file"  value="debug_ekf_localization.txt"/>
         <!-- If set to true will not run the filter on start. -->
         <param name="disabled_at_startup" value="true" />
@@ -98,7 +87,7 @@
         <!-- The process noise covariance, commonly denoted Q, is used to model uncertainty in the prediction stage of the filtering algorithms. In general, the larger the value for Q relative to the variance for a given variable in an input message, the faster the filter will converge to the value in the measurement.-->
             <!-- EKF param -->
             <!-- with differential cam1 & cam3 diff cam2 not diff-->
-            <!-- <rosparam param="process_noise_covariance">[1e-3, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+            <rosparam param="process_noise_covariance">[1e-3, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    1e-3, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    0,    1e-3, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    0,    0,    1e-3 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
@@ -112,9 +101,9 @@
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    5e-1, 0,    0,    0,
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    5e-1, 0,    0,
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    5e-1, 0,
-                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    5e-1]</rosparam> -->
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    5e-1]</rosparam>
             <!-- Covariance without the IMU -->
-            <rosparam param="process_noise_covariance">[1e-3, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+            <!-- <rosparam param="process_noise_covariance">[1e-3, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    1e-3, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    0,    1e-3, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    0,    0,    1e-1 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
@@ -128,7 +117,24 @@
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-5, 0,    0,    0,
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-12, 0,    0,
                                                         0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-12, 0,
-                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-12]</rosparam>
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-12]</rosparam> -->
+            <!-- Test with IMU and angular velocity - to improve stability inside the tank -->
+            <!-- <rosparam param="process_noise_covariance">[1e-3, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    1e-3, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    1e-3, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    1e-1 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    1e-1, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    1e-1, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    1e-2,  0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     1e-2,  0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     1e-2, 0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-5, 0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-5, 0,    0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-5, 0,    0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-3, 0,    0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-3, 0,
+                                                        0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-3]</rosparam> -->
+  
         <!-- Initial state -->
         <rosparam param="initial_state">[0.0,  0.0,  0.0,
                                          0.0,  0.0,  0.0,
