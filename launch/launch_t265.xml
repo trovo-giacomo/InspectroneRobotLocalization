@@ -9,6 +9,15 @@
     <node name="odom_throttler3" type="drop" pkg="topic_tools" 
         args="/camera3/odom/sample 7 8 /camera3/odom/sample_throttled" >
     </node>
+
+    <!-- launch node to throttle images for logging -->
+    <!-- <node name="drop_image1" pkg="topic_tools" type="drop" output="screen"
+        args="/camera3/fisheye1/image_raw  9 10 /camera3/fisheye1/image_raw_throttled">
+    </node>
+    <node name="drop_image2" pkg="topic_tools" type="drop" output="screen"
+        args="/camera3/fisheye2/image_raw  9 10 /camera3/fisheye2/image_raw_throttled">
+    </node> -->
+
     <rosparam>
         /camera1/tracking_module/frames_queue_size: 2
         /camera2/tracking_module/frames_queue_size: 2
@@ -32,7 +41,7 @@
     <arg name="tf_prefix_camera1"         default="$(arg camera1)"/>
     <arg name="tf_prefix_camera2"         default="$(arg camera2)"/>
     <arg name="tf_prefix_camera3"         default="$(arg camera3)"/>
-    <arg name="initial_reset"             default="true"/>
+    <arg name="initial_reset"             default="false"/>
     <arg name="reconnect_timeout"         default="5.0"/>
 
 

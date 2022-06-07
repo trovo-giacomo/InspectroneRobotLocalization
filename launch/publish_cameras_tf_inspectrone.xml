@@ -30,4 +30,15 @@
         <param name="publish_odom_tf" value="true" />
         <param name="camera_orientation" value="bottom" />
     </node>
+
+    <!-- Camera l515 - bottom -->
+    <node pkg="InspectroneRobotLocalization" type="publish_l515_tf.py" name="publish_l515_tf" output="screen">
+        <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_new_camera_calibration_imu_cam2_v1.yaml" />
+        <param name="odom_frame" type="str" value="/odom" />
+        <param name="base_frame" type="str" value="/imu" />
+        <param name="prefix_camera_tf" type="str" value="/l515" />
+        <param name="publish_cameras_tf" value="false" />
+        <param name="publish_odom_tf" value="true" />
+        <param name="camera_orientation" value="front" />
+    </node>
 </launch>
