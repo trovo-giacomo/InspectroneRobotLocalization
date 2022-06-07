@@ -60,7 +60,7 @@
         <param name="odom0_twist_rejection_threshold" value="5" /> -->
 
         <!-- <param name="imu0"  value="/mavros/imu/data" /> -->
-         <param name="imu0"  value="/imu/data_inflated" />
+        <!-- <param name="imu0"  value="/imu/data_inflated" />
         <rosparam param="imu0_config">[false, false, false,
                                         false, false, false,
                                         false, false, false,
@@ -70,7 +70,7 @@
         <param name="imu0_relative" value="false" />
         <param name="imu0_queue_size" value="50" />
         <param name="imu0_remove_gravitational_acceleration"  value="true"/>
-        <!-- <param name="imu0_twist_rejection_threshold" value="5" /> -->
+        <param name="imu0_twist_rejection_threshold" value="5" /> -->
         <!-- <param name="imu0_pose_rejection_threshold" value="0.5" /> -->
 
                 
@@ -90,8 +90,8 @@
             <rosparam param="process_noise_covariance">[1e-3, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    1e-3, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    0,    1e-3, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    1e-3 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                        0,    0,    0,    0,    1e-3, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    1e-2 ,0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                        0,    0,    0,    0,    1e-2, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    0,    0,    0,    0,    1e-2, 0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    0,    0,    0,    0,    0,    1e-2,  0,     0,    0,    0,    0,    0,    0,    0,
                                                         0,    0,    0,    0,    0,    0,    0,     1e-2,  0,    0,    0,    0,    0,    0,    0,
