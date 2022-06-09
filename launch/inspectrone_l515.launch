@@ -22,6 +22,7 @@
       <arg name="enable_accel"      value="false"/>
       <arg name="enable_pointcloud" value="true"/>
       <arg name="enable_sync"       value="true"/>
+      <arg name="initial_reset"      value="false" />
       <arg name="tf_prefix"         value="$(arg camera)"/>
     </include>
 <!-- <node name="tf_broadcaster_l515" pkg="tf" type="static_transform_publisher" args="0.0 0.0 0 0.0 -0.07 3.14 mynteye_points_frame camera_depth_frame 100"/> -->

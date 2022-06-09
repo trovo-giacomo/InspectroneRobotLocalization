@@ -66,26 +66,30 @@ if __name__ == '__main__':
     camera_prefix = rospy.get_param("~prefix_camera_tf")
     #is_pub_cameras_tf = rospy.get_param("~publish_cameras_tf")
     is_pub_tf = rospy.get_param("~publish_tf")
-    I = np.identity(4)
-    offset = np.identity(4)
+    I = np.identity(4) 
     static_transforms = []
     num_cameras = 1
     
     T_imu_cams = []
     ## load imu_camera yaml file and read transformation cam to imu
-    T_cam_imu = getTransformation(imu_file_path, "cam"+str(i), "T_cam_imu")
+    T_cam_imu = getTransformation(imu_file_path, "cam0", "T_cam_imu")
     T_imu_cam = np.linalg.inv(T_cam_imu)
+    T_imu_cam = T_cam_imu
 
 
     T_imu_cam_optical = T_imu_cam # reference frame in the optical frame
 
     ## TODO chek if this transformation is right from optical frame
     # build transform from that translate optical frame to camera_pose_frame:
-    T_optical_camPose = euler_matrix(0.0, -math.pi/2, math.pi/2)
+    #T_optical_camLink = euler_matrix(-math.pi/2, -math.pi/2, math.pi/2)
+    #T_optical_camLink = euler_matrix(math.pi/2, math.pi/2, math.pi)
+    T_x = euler_matrix(math.pi/2, 0, 0)
+    T_y = euler_matrix(0, math.pi/2, 0)
+    T_z = euler_matrix(0, 0, math.pi)
+    T_optical_camLink = concatenate_matrices(T_x,T_y,T_z)
+    #T_optical_camLink = euler_matrix(0, 0, 0)
     # transform form imu (base_link) to camera_pose_frame:
-    T_imu_camPose = concatenate_matrices(T_imu_cam_optical, T_optical_camPose)
-
-    T_imu_camPose = concatenate_matrices(offset,T_imu_camPose)
+    T_imu_camLink = concatenate_matrices( T_imu_cam_optical, T_optical_camLink)
     
     ## publish transformations as TF static transfroms
     broadcaster = tf2_ros.StaticTransformBroadcaster()
@@ -96,9 +100,9 @@ if __name__ == '__main__':
 
     # publish T_imu->cameras transformations - only if param publish_camera_tf is set to true
     # TODO ask if this is the correct orientation in which we want the reference frame to be
-    # if(is_pub_cameras_tf):
+    #if(is_pub_cameras_tf):
     #     for i,transform in enumerate(T_imu_cams):
-    #         T_static_imu_cam = buildStaticTransform(transform,base_frame, camera_prefix + "_optical_frame")
+    #    T_static_imu_cam = buildStaticTransform(transform,base_frame, camera_prefix + "_optical_frame")
     #         # stack all the transforomation in a list because broadcaster is latched to latched to /tf_static so only one stansform can be published at the time
     #         static_transforms.append(T_static_imu_cam)
     
@@ -107,14 +111,12 @@ if __name__ == '__main__':
         #---- T imu -> camera_optical_frame ----#
         #T_static_imu_camera_optical = buildStaticTransform(T_imu_cam_optical, odom_frame, camera_prefix + "_optical") # T imu -> camera_optical_frame
         #---- T imu -> camera_frame ----#
-        T_static_imu_camera = buildStaticTransform(T_imu_camPose, base_frame, camera_prefix + "_frame") 
-        T_static_camera_link = buildStaticTransform(I, camera_prefix + "_frame", camera_prefix + "_link")  # connect Kalibr trnasformation with TF tree L515
+        T_static_imu_camera = buildStaticTransform(T_imu_camLink, base_frame, camera_prefix + "_link") # connect Kalibr trnasformation with TF tree L515
         
        
         
         #---- stack all the transforomation in a list ----#
         static_transforms.append(T_static_imu_camera)
-        static_transforms.append(T_static_camera_link)
         
     #---- publish all the transformations ----#
     broadcaster.sendTransform(static_transforms)
