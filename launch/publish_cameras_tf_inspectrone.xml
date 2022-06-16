@@ -32,8 +32,8 @@
     </node>
 
     <!-- Camera l515 - bottom -->
-    <node pkg="InspectroneRobotLocalization" type="publish_l515_tf.py" name="publish_l515_tf" output="screen">
-        <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_camera_calibration_imu_l515.yaml" />
+    <node pkg="InspectroneRobotLocalization" type="publish_l515_tf_temp.py" name="publish_l515_tf" output="screen">
+        <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_new_camera_calibration_imu_cam2_v1.yaml" />
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
         <param name="prefix_camera_tf" type="str" value="/l515" />
