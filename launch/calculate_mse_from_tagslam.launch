@@ -1,0 +1,17 @@
+<launch>
+    <!-- Launch a bag with the three camera odometry topic or launch the 3 rs t265 cameras -->
+    <arg name="input_bag_name" default="waypoint_square_v6_9.bag" />
+    <arg name="folder" default="localization/waypoint_motion_capture/ekf_mix" />
+    <arg name="record" default="false" />
+    <arg name="extra_folder_record" default="post_processing" />
+    <arg name="start_at" default="0" />
+    <arg name="bag_rate" default="1" />
+    
+    <param name="use_sim_time" value="true" />
+    <node pkg="rosbag" type="play" name="player" output="screen" args="/home/giacomo/inspectrone_ws/bags/$(arg folder)/$(arg input_bag_name) --clock -s $(arg start_at) -r $(arg bag_rate)"/>
+
+    <node pkg="InspectroneRobotLocalization" name="synch_bag_mse" type="sync_bag_calculate_error_tank.py" output="screen" />
+    
+    <node pkg="rosbag" type="record" name="recorder" output="screen" args="-O /home/giacomo/inspectrone_ws/bags/$(arg folder)/$(arg extra_folder_record)/sync_$(arg input_bag_name) --all" if="$(arg record)" />
+
+</launch>
