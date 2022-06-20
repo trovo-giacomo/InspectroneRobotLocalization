@@ -1,32 +1,32 @@
 <launch>
     <!-- Visualize and publish IMU camera extrinsic for each stereo camera  -->
     <!-- Camera 1 - top -->
-    <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera1" output="screen">
+    <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_top" output="screen">
         <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_new_camera_calibration_imu_cam1_v1.yaml" />
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
-        <param name="prefix_camera_tf" type="str" value="/camera1" />
-        <param name="publish_cameras_tf" value="false" />
+        <param name="prefix_camera_tf" type="str" value="/top_cam" />
+        <param name="publish_cameras_tf" value="true" />
         <param name="publish_odom_tf" value="true" />
         <param name="camera_orientation" value="top" />
     </node>
     <!-- Camera 2 - front -->
-    <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera2" output="screen">
+    <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_front" output="screen">
         <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_new_camera_calibration_imu_cam2_v1.yaml" />
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
-        <param name="prefix_camera_tf" type="str" value="/camera2" />
-        <param name="publish_cameras_tf" value="false" />
+        <param name="prefix_camera_tf" type="str" value="/front_cam" />
+        <param name="publish_cameras_tf" value="true" />
         <param name="publish_odom_tf" value="true" />
         <param name="camera_orientation" value="front" />
     </node>
     <!-- Camera 3 - bottom -->
-    <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_camera3" output="screen">
+    <node pkg="InspectroneRobotLocalization" type="publish_t265_tf.py" name="publish_t265_tf_bottom" output="screen">
         <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_new_camera_calibration_imu_cam3_v1.yaml" />
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
-        <param name="prefix_camera_tf" type="str" value="/camera3" />
-        <param name="publish_cameras_tf" value="false" />
+        <param name="prefix_camera_tf" type="str" value="/bottom_cam" />
+        <param name="publish_cameras_tf" value="true" />
         <param name="publish_odom_tf" value="true" />
         <param name="camera_orientation" value="bottom" />
     </node>

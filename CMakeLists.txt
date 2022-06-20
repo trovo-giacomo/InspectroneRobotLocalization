@@ -223,3 +223,6 @@ target_link_libraries(transform_rl_odometry ${catkin_LIBRARIES})
 add_executable(test_rotations_cov src/test_rotations_cov.cpp)
 target_link_libraries(test_rotations_cov ${catkin_LIBRARIES})
 
+add_executable(publish_odom_single_rs src/publish_odom_single_rs.cpp)
+target_link_libraries(publish_odom_single_rs ${catkin_LIBRARIES})
+

@@ -144,7 +144,7 @@ if __name__ == '__main__':
         
         #---- T camera_pose_frame -> base_link ----#
         T_pose_base_link = np.linalg.inv(T_imu_camPose)
-        T_static_pose_base_link  = buildStaticTransform(T_pose_base_link, camera_prefix + "_pose_frame", "/base_link_"+str(camera_prefix[-1]))
+        T_static_pose_base_link  = buildStaticTransform(T_pose_base_link, camera_prefix + "_pose_frame", "/base_link_"+str(camera_prefix.split("/")[1].split("_")[0]))
 
         #---- stack all the transforomation in a list ----#
         #static_transforms.append(T_static_imu_camera_optical)
