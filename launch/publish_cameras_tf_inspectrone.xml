@@ -36,7 +36,7 @@
         <param name="imu_cam_calib_path" value="$(find InspectroneRobotLocalization)/data/camchain-imucam-rs_new_camera_calibration_imu_cam2_v1.yaml" />
         <param name="odom_frame" type="str" value="/odom" />
         <param name="base_frame" type="str" value="/imu" />
-        <param name="prefix_camera_tf" type="str" value="/l515" />
+        <param name="prefix_camera_tf" type="str" value="/L515" />
         <param name="publish_tf" value="true" />
     </node>
 </launch>
