@@ -1,6 +1,9 @@
 <!-- EKF configured to take cameras odometry only orientation and velocity (not differential) -->
 <launch>
     <arg name="node_start_delay"         default="20.0"/>
+    <arg name="camera1_prefix"         default="cam1"/>
+    <arg name="camera2_prefix"         default="cam2"/>
+    <arg name="camera3_prefix"         default="cam3"/>
     <node name="ekf_odom" pkg="robot_localization" type="ekf_localization_node" clear_params="true" required="true"  launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
         <param name="sensor_timeout" value="1"/>
         <!--param name="map_frame" value="map" /-->
@@ -13,7 +16,7 @@
         
 
         <!-- X,Y,Z,roll,pitch,yaw,X˙,Y˙,Z˙,roll˙,pitch˙,yaw˙,X¨,Y¨,Z¨)-->
-        <param name="odom0" value="/cam1/odom/sample_throttled" />
+        <param name="odom0" value="/$(arg camer1_prefix)/odom/sample_throttled" />
         <rosparam param="odom0_config">[
                                         false, false, false,
                                         true, true, true,
@@ -26,7 +29,7 @@
         <!-- <param name="odom0_twist_rejection_threshold" value="5" />
         <param name="odom0_pose_rejection_threshold" value="5" /> -->
 
-        <param name="odom1" value="/cam2/odom/sample_throttled" />
+        <param name="odom1" value="/$(arg camer2_prefix)/odom/sample_throttled" />
         <rosparam param="odom1_config">[
                                         false, false, false,
                                         true, true, true,
@@ -39,7 +42,7 @@
         <!-- <param name="odom1_pose_rejection_threshold" value="5" /> -->
         <!-- <param name="odom1_twist_rejection_threshold" value="50" /> -->
 
-        <param name="odom2" value="/cam3/odom/sample_throttled" />
+        <param name="odom2" value="/$(arg camer3_prefix)/odom/sample_throttled" />
         <rosparam param="odom2_config">[
                                         false, false, false,
                                         true, true, true,
