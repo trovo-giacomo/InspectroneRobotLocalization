@@ -1,0 +1,48 @@
+<launch>
+    <!-- Topic to record (substitute # with the number of the camera):
+        - /camera#/fisheye1/image_raw_throttled 
+        - /camera#/fisheye2/image_raw_throttled 
+        - /mavros/imu/data
+     -->
+    <!-- Launch file for DTU Drone 2 -->
+    <arg name="pkg_localization" value="InspectroneRobotLocalization" />
+       
+    <!-- Pixhawk 4 communication: -->
+    <!-- launch mavros  --> 
+    <include file  ="$(find px4_vio_bridge)/launch/bridge_mavros.launch" />
+    <!-- <include file  ="$(find px4_realsense_bridge)/launch/bridge_mavros.launch" /> -->
+
+
+    <!-- launch t265  -->
+    <include file="$(find InspectroneRobotLocalization)/launch/launch_t265.xml" > </include>
+
+    <node name="drop_image1" pkg="topic_tools" type="throttle" output="screen"
+        args=" messages /camera1/fisheye1/image_raw  20.0 /camera1/fisheye1/image_raw_throttled">
+    </node>
+    <node name="drop_image2" pkg="topic_tools" type="throttle" output="screen"
+        args=" messages /camera1/fisheye2/image_raw  20.0 /camera1/fisheye2/image_raw_throttled">
+    </node>
+
+    <node name="drop_image3" pkg="topic_tools" type="throttle" output="screen"
+        args=" messages /camera2/fisheye1/image_raw  20.0 /camera2/fisheye1/image_raw_throttled">
+    </node>
+    <node name="drop_image4" pkg="topic_tools" type="throttle" output="screen"
+        args=" messages /camera2/fisheye2/image_raw 20.0 /camera2/fisheye2/image_raw_throttled">
+    </node>
+
+    <node name="drop_image5" pkg="topic_tools" type="throttle" output="screen"
+        args=" messages /camera3/fisheye1/image_raw 20.0 /camera3/fisheye1/image_raw_throttled">
+    </node>
+    <node name="drop_image6" pkg="topic_tools" type="throttle" output="screen"
+        args=" messages /camera3/fisheye2/image_raw 20.0 /camera3/fisheye2/image_raw_throttled">
+    </node>
+
+    <!-- Set up mavros IMU frequencies to 200 Hz-->
+    <node name="increase_imu_data_hz" type="mavcmd" pkg="mavros" 
+        args="long 511 31 1000 0 0 0 0 0" >
+    </node>
+        <node name="increase_imu_data_raw_hz" type="mavcmd" pkg="mavros" 
+        args="long 511 105 1000 0 0 0 0 0" >
+    </node>
+
+</launch>
