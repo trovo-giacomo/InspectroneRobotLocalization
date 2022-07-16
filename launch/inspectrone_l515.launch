@@ -1,5 +1,5 @@
 <launch>
-  <arg name="serial_no"             default="f1120540"/>
+  <arg name="serial_no"             default="f1061449"/>
   <arg name="json_file_path"        default=""/>
   <arg name="camera"                default="l515"/>
 

@@ -32,9 +32,9 @@
         /camera3/tracking_module/enable_relocalization: false
     </rosparam>
     
-    <arg name="serial_no_camera1"    			default="144222110625"/> 			<!-- Note: Replace with actual serial number -->
-    <arg name="serial_no_camera2"    			default="144222110422"/> 			<!-- Note: Replace with actual serial number -->
-    <arg name="serial_no_camera3"    			default="905312112087"/> 			<!-- Note: Replace with actual serial number -->
+    <arg name="serial_no_camera1"    			default="144222110401"/> 			<!-- Note: Replace with actual serial number -->
+    <arg name="serial_no_camera2"    			default="144222110947"/> 			<!-- Note: Replace with actual serial number -->
+    <arg name="serial_no_camera3"    			default="909212110132"/> 			<!-- Note: Replace with actual serial number -->
     <arg name="camera1"              			default="camera1"/>		<!-- Note: Replace with camera name -->
     <arg name="camera2"              			default="camera2"/>		<!-- Note: Replace with camera name -->
     <arg name="camera3"              			default="camera3"/>		<!-- Note: Replace with camera name -->
@@ -109,7 +109,7 @@
         <arg name="publish_tf"                value="true" />
     </include>
 
-    <!-- 144222110625 - top -->
-    <!-- 144222110422 - front -->
-    <!-- 905312112087 - bottom -->
+    <!-- 144222110401 - top -->
+    <!-- 144222110947 - front -->
+    <!-- 909212110132 - bottom -->
 </launch>

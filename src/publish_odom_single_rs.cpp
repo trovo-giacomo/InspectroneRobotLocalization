@@ -1,4 +1,5 @@
 #include "ros/ros.h"
+#include "tf/transform_broadcaster.h"
 #include "nav_msgs/Odometry.h"
 #include "geometry_msgs/PoseWithCovariance.h"
 #include "geometry_msgs/Pose.h"
@@ -6,6 +7,7 @@
 #include "geometry_msgs/TwistWithCovariance.h"
 #include "std_srvs/Empty.h"
 #include "pose_cov_ops/pose_cov_ops.h"
+// #include "tf/transform_broadcaster.h"
 #include "tf/transform_listener.h"
 
 using namespace std;
@@ -155,6 +157,10 @@ void transformTwist(geometry_msgs::TwistWithCovariance msg_twist, geometry_msgs:
 
 
 void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
+    // set up transform broadcaster
+    static tf::TransformBroadcaster br;
+    tf::Transform transform;
+    
     //cout << ".1 Now reveived new odometry message -> convertion in process" << endl;
     geometry_msgs::PoseWithCovariance p_camOdo_pose, p_odom_bl;
     geometry_msgs::TwistWithCovariance msg_twist, new_twist, new_twist_cov;
@@ -213,12 +219,21 @@ void handle_odometry_rs(const nav_msgs::Odometry::ConstPtr& msg){
         state = 1;
     }
 
+    /* Send transformation from odom to base_link */
+    transform.setOrigin( tf::Vector3(transformed_odom.pose.pose.position.x, transformed_odom.pose.pose.position.y, transformed_odom.pose.pose.position.z) );
+    tf::Quaternion q(transformed_odom.pose.pose.orientation.x,transformed_odom.pose.pose.orientation.y,transformed_odom.pose.pose.orientation.z,transformed_odom.pose.pose.orientation.w);
+
+    transform.setRotation(q);
+    br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "odom", "base_link"));
+
 }//handle_odometry_rs
 
-
+/*
+Rebublish odometry of topic in in camra/odom/sample_throttled between odom and base link frame   
+*/
 int main(int argc, char **argv) {
     // init node
-    ros::init(argc, argv, "republish_transformed_odom");
+    ros::init(argc, argv, "republish_odom");
     ros::NodeHandle n("~");
     // init prev prose with covariance - used to filter out messages with wrong orientation wrt to the previous one
     prevPose = geometry_msgs::PoseWithCovariance();
@@ -234,6 +249,8 @@ int main(int argc, char **argv) {
 
     string topic_pub = "/"+prefix_odom + "/odom/sample_throttled";
     string topic_sub = "/"+camera+"/odom/sample_throttled";
+    cout << "Topic sub: " << topic_sub << endl;
+    cout << "Topic pub: " << topic_pub << endl;
     //string topic_sub = "/"+camera+"/odom/sample";
     
     //init static transform
@@ -245,7 +262,7 @@ int main(int argc, char **argv) {
     ros::Duration(2.0).sleep();
 
     // ============== Transform odom to camera_odom_frame: ==========================================
-    cout << "1. Now look up for transform from odom to camera_odom_frame" << endl;
+    //cout << "1. Now look up for transform from odom to camera_odom_frame" << endl;
     try{
         ros::Time now = ros::Time::now();
         listener.waitForTransform("/odom", "/"+camera+"_odom_frame", now, ros::Duration(10.0));
@@ -261,6 +278,7 @@ int main(int argc, char **argv) {
         p_odom_camOdo.orientation.z = q_t_odom_cameraOdom.z();
         p_odom_camOdo.orientation.w = q_t_odom_cameraOdom.w();
 
+
         //cout << "p_odo_camOdo orientation: " << p_odom_camOdo.orientation.x << " " <<p_odom_camOdo.orientation.y << " " << p_odom_camOdo.orientation.z << " " << p_odom_camOdo.orientation.w << endl;
     }
     catch(tf::TransformException &ex){
@@ -268,7 +286,7 @@ int main(int argc, char **argv) {
         ros::Duration(1.0).sleep();
     }
     // ============== Transform camera_pose_frame to base_link: ==========================================
-    cout << "2. Now look up for transform from camera_pose_frame to base_link" << endl;
+    //cout << "2. Now look up for transform from camera_pose_frame to base_link" << endl;
     try{
         ros::Time now = ros::Time::now();
         listener.waitForTransform(("/"+camera+"_pose_frame").c_str(), base_link.c_str(), now, ros::Duration(10.0));
@@ -282,15 +300,13 @@ int main(int argc, char **argv) {
         p_camPose_bl.orientation.y = q_t_cameraPose_bl.y();
         p_camPose_bl.orientation.z = q_t_cameraPose_bl.z();
         p_camPose_bl.orientation.w = q_t_cameraPose_bl.w();
-
-
     }
     catch(tf::TransformException &ex){
         ROS_ERROR("%s",ex.what());
         ros::Duration(1.0).sleep();
     }
     // ============== Subscribe and advertise topic: ==========================================
-    cout << "3. Now subscribe to topic and publish new one" << endl;
+    //cout << "3. Now subscribe to topic and publish new one" << endl;
     odom_pub  = n.advertise<nav_msgs::Odometry>(topic_pub.c_str(), 100);
     odom_sub = n.subscribe(topic_sub.c_str(), 100, handle_odometry_rs);
 
@@ -302,10 +318,10 @@ int main(int argc, char **argv) {
 
     // now I am sure that at least one camera is up - enable robot_localization
     //call service /ekf_odom/enable
-    ros::service::waitForService("/ekf_odom/enable");
-    ros::ServiceClient startRL = n.serviceClient<std_srvs::Empty>("/ekf_odom/enable");
-    std_srvs::Empty srv;
-    startRL.call(srv);
+    //ros::service::waitForService("/ekf_odom/enable");
+    //ros::ServiceClient startRL = n.serviceClient<std_srvs::Empty>("/ekf_odom/enable");
+    //std_srvs::Empty srv;
+    //startRL.call(srv);
     ros::spin();
     return 0;
 
